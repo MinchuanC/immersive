@@ -1,0 +1,25 @@
+/* Donor CSS is confined to this document; the surrounding Folia shell owns navigation. */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#06080c!important}
+#custom-bg{position:absolute;inset:-8%;background-size:cover;background-position:center;filter:blur(35px) saturate(1.25);transform:scale(1.13);pointer-events:none}
+#custom-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,rgba(4,6,10,.25),rgba(3,5,8,.65))}
+#canvas-container{position:absolute;inset:0;z-index:2}
+#stage-track{position:absolute;top:32px;left:40px;display:flex;align-items:center;gap:14px;pointer-events:none;z-index:15;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif}
+#stage-cover{width:52px;height:52px;object-fit:cover;border-radius:10px;box-shadow:0 8px 30px #0007}
+#stage-cover:not([src]),#stage-cover[src=""]{display:none}
+#stage-track strong{display:block;font-size:15px;font-weight:600;letter-spacing:.01em}
+#stage-track span{display:block;margin-top:5px;font-size:12px;opacity:.52}
+.stage-no-controls #fx-fab,.stage-no-controls #fx-fab-hide-btn,.stage-no-controls #bottom-bar,.stage-no-controls #bottom-handle,.stage-no-controls #stage-track{display:none!important}
+.stage-unavailable{opacity:.35;cursor:not-allowed!important}
+.stage-reduced-motion *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+#fx-panel{max-height:calc(100vh - 130px)}
+#stage-console-close{width:36px;height:36px;flex:none;display:grid;place-items:center;font-size:24px;line-height:1}
+#fx-fab{z-index:80}
+#fx-fab-hide-btn{z-index:81}
+#toast{z-index:200}
+#stage-lyric-renderer { display:flex; flex-direction:column; gap:10px; padding:14px; margin-bottom:12px; border:1px solid #ffffff24; border-radius:12px }
+#stage-lyric-renderer label { font-size:12px; color:#ffffffa0 }
+#stage-lyric-renderer button[aria-pressed="true"] { background:#ffffff20; color:#fff }
+.stage-folia-lyrics [data-fx-page="lyrics"] > :not(#stage-lyric-renderer) { opacity:.35 }
+@media(max-width:800px){#stage-track{left:24px;top:24px}#fx-panel{max-width:calc(100vw - 40px)}#bottom-bar .control-cluster.actions{display:none}}
+/* Keyboard focus follows the same enabled visual toggles as pointer interaction. */
+.fx-toggle:focus-visible { outline: 2px solid rgba(191,224,243,.9); outline-offset: 3px; }

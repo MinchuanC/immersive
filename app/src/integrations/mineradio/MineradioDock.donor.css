@@ -1,0 +1,2234 @@
+/* GPL-3.0: scoped directly from MineRadio d43de565 public/css/index.css. Regenerate with extractDonor.mjs. */
+.mineradio-dock {
+  --font-sans: "Noto Sans SC", "PingFang SC", "HarmonyOS Sans SC", "Alibaba PuHuiTi", "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Geist Mono", "SF Mono", ui-monospace, monospace;
+  --fc-bg: #08090B;
+  --fc-paper: #0E1014;
+  --fc-ink: #E8ECEF;
+  --fc-ink-2: #D2D7DC;
+  --fc-muted: #8A9099;
+  --fc-hair: #1A1D22;
+  --fc-hair-2: #262A31;
+  --fc-accent: #FFFFFF;
+  --fc-accent-hov: #FFFFFF;
+  --fc-accent-rgb: 255, 255, 255;
+  --fc-blue: #2442ff;
+  --fc-warm: #f8f4ee;
+  --chill-ink: #030608;
+  --chill-deep: #061116;
+  --chill-cyan: #8fe9ff;
+  --chill-blue: #73a7ff;
+  --chill-mint: #9cffdf;
+  --chill-soft: rgba(214, 248, 255, .9);
+  --champagne: #f4d28a;
+  --champagne-deep: #9a6f2c;
+  --home-accent: #00f5d4;
+  --home-accent-rgb: 0, 245, 212;
+  --visual-tint: #9db8cf;
+  --source-netease: #d95b67;
+  --source-qq: #00F5D4;
+  --source-qishui: #45d68f;
+  --source-spotify: #1ed760;
+  --source-local: #9db8cf
+;
+  --glass-bg: linear-gradient(112deg, rgba(72, 74, 76, .62), rgba(24, 27, 30, .70) 48%, rgba(8, 12, 14, .74));
+  --glass-bg-focus: linear-gradient(112deg, rgba(88, 91, 92, .68), rgba(28, 32, 35, .76) 50%, rgba(8, 13, 15, .82));
+  --glass-border: rgba(0, 245, 212, .30);
+  --glass-border-soft: rgba(255, 255, 255, .095);
+  --glass-shadow: 0 22px 64px rgba(0, 0, 0, .30), 0 0 34px rgba(0, 245, 212, .052), inset 0 1px 0 rgba(255, 255, 255, .16), inset 0 -24px 58px rgba(0, 0, 0, .16);
+  --glass-shadow-focus: 0 24px 72px rgba(0, 0, 0, .34), 0 0 0 1px rgba(0, 245, 212, .13), 0 0 42px rgba(0, 245, 212, .075), inset 0 1px 0 rgba(255, 255, 255, .20)
+;
+  --saved-panel-glass-bg: rgba(0, 0, 0, .10);
+  --saved-panel-glass-filter: blur(12px) saturate(1.8) brightness(1.16);
+  --saved-panel-glass-svg-filter: url(#mineradio-control-glass-filter) saturate(1);
+  --saved-panel-glass-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .35), inset 0 0 10px 4px rgba(255, 255, 255, .15), 0 4px 16px rgba(17, 17, 26, .05), 0 8px 24px rgba(17, 17, 26, .05), 0 16px 56px rgba(17, 17, 26, .05), inset 0 4px 16px rgba(17, 17, 26, .05), inset 0 8px 24px rgba(17, 17, 26, .05), inset 0 16px 56px rgba(17, 17, 26, .05);
+  --saved-panel-glass-radius: 50px;
+  --saved-button-glass-bg: rgba(0, 0, 0, .10);
+  --saved-button-glass-filter: blur(12px) saturate(1.8) brightness(1.16);
+  --saved-button-glass-svg-filter: url(#mineradio-control-glass-filter) saturate(1);
+  --saved-button-glass-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .34), inset 0 0 10px 4px rgba(255, 255, 255, .13), 0 10px 30px rgba(0, 0, 0, .18);
+  --saved-button-glass-hover-bg: rgba(255, 255, 255, .055);
+  --saved-button-glass-hover-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .42), inset 0 0 12px 5px rgba(255, 255, 255, .17), 0 12px 34px rgba(0, 0, 0, .22), 0 0 18px rgba(255, 255, 255, .06)
+;
+  --home-icon-color: #f4d28a;
+  --home-icon-rgb: 244, 210, 138;
+  --visual-icon-color: #7fd8ff;
+  --visual-icon-rgb: 127, 216, 255
+;
+  --panel-glass-filter: blur(22px) saturate(1.22) brightness(1.04);
+  --panel-glass-bg: radial-gradient(circle at 16% 0%, rgba(255, 255, 255, .10), transparent 34%), radial-gradient(circle at 88% 8%, rgba(var(--home-accent-rgb), .12), transparent 36%), linear-gradient(145deg, rgba(var(--home-accent-rgb), .115), rgba(12, 13, 18, .70) 42%, rgba(2, 3, 5, .66));
+  --panel-glass-shadow: 0 24px 78px rgba(0, 0, 0, .44), 0 0 0 1px rgba(255, 255, 255, .045), inset 0 1px 0 rgba(255, 255, 255, .18), inset 0 -18px 42px rgba(0, 0, 0, .16);
+  --panel-button-bg: linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(var(--home-accent-rgb), .060) 46%, rgba(0, 0, 0, .14));
+  --desktop-safe-top: 0px;
+  --desktop-safe-right: 0px;
+  --desktop-safe-bottom: 0px;
+  --desktop-safe-left: 0px
+}
+
+.mineradio-dock.control-glass-svg-ok .glass-saved-panel {
+  background: var(--saved-panel-glass-bg);
+  backdrop-filter: var(--saved-panel-glass-svg-filter);
+  -webkit-backdrop-filter: var(--saved-panel-glass-svg-filter)
+}
+
+.mineradio-dock.control-glass-svg-ok .glass-saved-button {
+  backdrop-filter: var(--saved-button-glass-svg-filter);
+  -webkit-backdrop-filter: var(--saved-button-glass-svg-filter)
+}
+
+@keyframes mineradio-dock-desktop-window-restore {
+  from {
+    opacity: .01;
+    transform: translate3d(0, 18px, 0) scale(.97);
+    filter: blur(7px) saturate(.9)
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0) scale(1);
+    filter: none
+  }
+}
+
+@keyframes mineradio-dock-splash-field-breathe {
+  0% {
+    opacity: .72;
+    transform: scale(1)
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1.035)
+  }
+}
+
+@keyframes mineradio-dock-splash-mine-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(48% 0 49% 0);
+    transform: translate(calc(-50% - 10px), -42%) skewX(-10deg) scaleX(1.08);
+    letter-spacing: .055em
+  }
+
+  14% {
+    opacity: .92;
+    clip-path: inset(40% 0 42% 0);
+    transform: translate(calc(-50% - 4px), -50%) skewX(-4deg) scaleX(1.04);
+    letter-spacing: .014em
+  }
+
+  26% {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: translate(-50%, -50%) skewX(0) scaleX(1);
+    letter-spacing: -.040em
+  }
+
+  48% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1)
+  }
+
+  67% {
+    opacity: 1;
+    transform: translate(calc(-50% - clamp(66px, 10.8vw, 130px)), -50%) scale(.998);
+    letter-spacing: -.055em
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(calc(-50% - clamp(66px, 10.8vw, 130px)), -50%) scale(.998)
+  }
+}
+
+@keyframes mineradio-dock-splash-radio-in {
+
+  0%,
+  32% {
+    opacity: 0;
+    clip-path: inset(52% 0 44% 0);
+    transform: translate(calc(-50% + clamp(78px, 12vw, 142px)), -50%) skewX(9deg) scaleX(1.06);
+    background-position: 0 0
+  }
+
+  48% {
+    opacity: .88;
+    clip-path: inset(34% 0 32% 0);
+    transform: translate(calc(-50% + clamp(72px, 11.5vw, 138px)), -50%) skewX(3deg) scaleX(1.02);
+    background-position: 52% 0
+  }
+
+  66% {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: translate(calc(-50% + clamp(70px, 11.4vw, 136px)), -50%) scale(1);
+    background-position: 76% 0
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(calc(-50% + clamp(70px, 11.4vw, 136px)), -50%) scale(1);
+    background-position: 100% 0
+  }
+}
+
+@keyframes mineradio-dock-splash-i-dot-pop {
+
+  0%,
+  48% {
+    opacity: 0;
+    transform: translate(-50%, .22em) scale(.34)
+  }
+
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -.018em) scale(1.12)
+  }
+
+  68% {
+    opacity: .92;
+    transform: translate(-50%, .010em) scale(.94)
+  }
+
+  76%,
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1)
+  }
+}
+
+@keyframes mineradio-dock-splash-signal-line {
+
+  0%,
+  28% {
+    opacity: 0;
+    transform: scaleX(.10)
+  }
+
+  44% {
+    opacity: .98;
+    transform: scaleX(1.05)
+  }
+
+  64% {
+    opacity: .70;
+    transform: scaleX(.82)
+  }
+
+  76% {
+    opacity: 1;
+    transform: scaleX(1.14);
+    box-shadow: 0 0 28px rgba(244, 210, 138, .36), 0 0 60px rgba(122, 215, 194, .18)
+  }
+
+  100% {
+    opacity: .30;
+    transform: scaleX(.64)
+  }
+}
+
+@keyframes mineradio-dock-splash-signal-blip {
+
+  0%,
+  42% {
+    opacity: 0;
+    left: 18%;
+    transform: translate(-50%, -50%) scale(.24)
+  }
+
+  62% {
+    opacity: .94;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1)
+  }
+
+  76% {
+    opacity: 1;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.45)
+  }
+
+  100% {
+    opacity: .16;
+    left: 82%;
+    transform: translate(-50%, -50%) scale(.46)
+  }
+}
+
+@keyframes mineradio-dock-splash-sub-in {
+
+  0%,
+  38% {
+    opacity: 0;
+    transform: translateY(7px)
+  }
+
+  56% {
+    opacity: .58;
+    transform: translateY(0)
+  }
+
+  100% {
+    opacity: .42;
+    transform: translateY(0)
+  }
+}
+
+@keyframes mineradio-dock-splash-enter-pulse {
+  0% {
+    opacity: .46;
+    text-shadow: 0 0 14px rgba(244, 210, 138, .16), 0 0 26px rgba(122, 215, 194, .08)
+  }
+
+  100% {
+    opacity: .78;
+    text-shadow: 0 0 22px rgba(244, 210, 138, .30), 0 0 42px rgba(122, 215, 194, .16)
+  }
+}
+
+.mineradio-dock.startup-fast-skip-preload #bottom-bar {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important
+}
+
+.mineradio-dock.startup-fast-skip-revealing #bottom-bar {
+  transition-duration: 420ms !important
+}
+
+.mineradio-dock.simple-mode #controls-hide-btn {
+  display: none !important
+}
+
+.mineradio-dock.simple-mode .control-cluster.modes {
+  gap: 12px
+}
+
+.mineradio-dock.simple-mode #bottom-bar {
+  width: min(1060px, calc(100vw - 56px))
+}
+
+.mineradio-dock.simple-mode #controls {
+  grid-template-columns: minmax(310px, 1.05fr) minmax(344px, auto) minmax(230px, .72fr)
+}
+
+.mineradio-dock.simple-mode .control-meta {
+  max-width: 420px
+}
+
+@keyframes mineradio-dock-home-disc-turn {
+  to {
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes mineradio-dock-home-eq-rise {
+
+  0%,
+  100% {
+    transform: scaleY(.68);
+    opacity: .66
+  }
+
+  45% {
+    transform: scaleY(1);
+    opacity: 1
+  }
+}
+
+@keyframes mineradio-dock-home-card-float {
+
+  0%,
+  100% {
+    transform: translateY(0)
+  }
+
+  50% {
+    transform: translateY(-2px)
+  }
+}
+
+@keyframes mineradio-dock-home-visual-drift {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg)
+  }
+
+  50% {
+    transform: translate3d(0, -5px, 0) rotate(.6deg)
+  }
+}
+
+@keyframes mineradio-dock-home-shimmer {
+  100% {
+    transform: translateX(100%)
+  }
+}
+.mineradio-dock .control-glass-filter-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none
+}
+
+.mineradio-dock #bottom-bar {
+  position: fixed;
+  z-index: 6;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(36px) scale(.972);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  filter: none;
+  transition: opacity .34s cubic-bezier(.16, 1, .3, 1), transform .46s cubic-bezier(.16, 1, .3, 1), filter .38s cubic-bezier(.16, 1, .3, 1);
+  width: min(1080px, calc(100vw - 56px));
+  padding: 9px 22px 14px;
+  border-radius: 50px;
+  background: transparent;
+  border: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none
+}
+
+.mineradio-dock.control-glass-svg-ok #bottom-bar {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none
+}
+
+.mineradio-dock #bottom-bar::before {
+  content: none
+}
+
+.mineradio-dock #bottom-bar::after {
+  content: none
+}
+
+.mineradio-dock #bottom-bar.visible {
+  opacity: .91;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
+  filter: blur(0);
+  background: rgba(0, 0, 0, .10);
+  backdrop-filter: blur(12px) saturate(1.8) brightness(1.16);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8) brightness(1.16);
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .35), inset 0 0 10px 4px rgba(255, 255, 255, .15), 0 4px 16px rgba(17, 17, 26, .05), 0 8px 24px rgba(17, 17, 26, .05), 0 16px 56px rgba(17, 17, 26, .05), inset 0 4px 16px rgba(17, 17, 26, .05), inset 0 8px 24px rgba(17, 17, 26, .05), inset 0 16px 56px rgba(17, 17, 26, .05)
+}
+
+.mineradio-dock.control-glass-svg-ok #bottom-bar.visible {
+  background: rgba(0, 0, 0, .10);
+  backdrop-filter: url(#mineradio-control-glass-filter) saturate(1);
+  -webkit-backdrop-filter: url(#mineradio-control-glass-filter) saturate(1)
+}
+
+.mineradio-dock #bottom-bar.soft-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(88px) scale(.972);
+  filter: none;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none
+}
+
+.mineradio-dock.home-controls-locked #bottom-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(-50%) translateY(92px) scale(.985) !important;
+  filter: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important
+}
+
+.mineradio-dock #bottom-bar.stage-mode {
+  bottom: 14px;
+  width: calc(100vw - 56px)
+}
+
+.mineradio-dock #progress-bar {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  width: calc(100% - clamp(86px, 10vw, 156px));
+  height: 4px;
+  margin: 4px auto 1px;
+  background: rgba(255, 255, 255, 0.095);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .2s, box-shadow .2s;
+  overflow: visible;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .12), inset 0 -1px 1px rgba(0, 0, 0, .20)
+}
+
+.mineradio-dock #progress-bar:hover,
+.mineradio-dock #progress-bar.is-dragging {
+  height: 5px;
+  background: rgba(255, 255, 255, .14);
+  box-shadow: 0 0 18px rgba(var(--fc-accent-rgb), .10), inset 0 1px 1px rgba(255, 255, 255, .18)
+}
+
+.mineradio-dock #progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .92), rgba(var(--fc-accent-rgb), .74));
+  border-radius: 999px;
+  box-shadow: 0 0 16px rgba(var(--fc-accent-rgb), .18)
+}
+
+.mineradio-dock #progress-thumb {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #fff 0, #fff 28%, rgba(194, 235, 255, .86) 74%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .34), 0 0 18px rgba(178, 229, 255, .28);
+  transform: translate(-50%, -50%) scale(.72);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s, transform .16s
+}
+
+.mineradio-dock #progress-bar:hover #progress-thumb,
+.mineradio-dock #progress-bar.is-dragging #progress-thumb {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1)
+}
+
+.mineradio-dock #progress-thumb::before,
+.mineradio-dock #progress-thumb::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 0 10px rgba(255, 68, 88, .42);
+  opacity: 0;
+  transform: translate(-50%, -50%)
+}
+
+.mineradio-dock #progress-bar.is-dragging #progress-thumb::before {
+  animation: mineradio-dock-thumb-particle-a .62s ease-out infinite
+}
+
+.mineradio-dock #progress-bar.is-dragging #progress-thumb::after {
+  animation: mineradio-dock-thumb-particle-b .72s ease-out infinite
+}
+
+@keyframes mineradio-dock-thumb-particle-a {
+  0% {
+    opacity: .8;
+    transform: translate(-50%, -50%) scale(1)
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-18px, -17px) scale(.2)
+  }
+}
+
+@keyframes mineradio-dock-thumb-particle-b {
+  0% {
+    opacity: .7;
+    transform: translate(-50%, -50%) scale(1)
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(16px, 13px) scale(.22)
+  }
+}
+
+@keyframes mineradio-dock-progress-particle-fade {
+  0% {
+    opacity: .95;
+    transform: translate3d(var(--px, 0), var(--py, 0), 0) scale(1)
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--px, 0) + var(--dx, 0)), calc(var(--py, 0) + var(--dy, 0)), 0) scale(.15)
+  }
+}
+
+.mineradio-dock #controls {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(340px, 1.08fr) minmax(380px, auto) minmax(400px, 1.08fr);
+  align-items: center;
+  gap: 18px
+}
+
+.mineradio-dock .control-cluster {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  height: 62px
+}
+
+.mineradio-dock .control-cluster.actions {
+  grid-column: 1;
+  justify-content: flex-start;
+  overflow: visible
+}
+
+.mineradio-dock .control-cluster.transport {
+  grid-column: 2;
+  justify-content: center
+}
+
+.mineradio-dock .control-cluster.modes {
+  grid-column: 3;
+  justify-content: flex-end
+}
+
+.mineradio-dock .control-divider {
+  display: none
+}
+
+.mineradio-dock .control-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1
+}
+
+.mineradio-dock .control-cluster.actions #quality-control {
+  flex: 0 0 auto;
+  margin-left: 0
+}
+
+.mineradio-dock .control-cover {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(255, 255, 255, .070);
+  border: 0;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .20), inset 0 0 0 1px rgba(255, 255, 255, .08);
+  cursor: pointer;
+  transition: transform .18s ease, opacity .2s ease, box-shadow .2s ease;
+  flex: 0 0 auto
+}
+
+.mineradio-dock .control-cover:focus-visible {
+  outline: 2px solid rgba(var(--fc-accent-rgb), .78);
+  outline-offset: 3px
+}
+
+.mineradio-dock .control-cover.cover-empty {
+  background-image: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, .18), transparent 24%), linear-gradient(135deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .025));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055), 0 8px 22px rgba(0, 0, 0, .22)
+}
+
+.mineradio-dock .control-meta {
+  min-width: 0;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px
+}
+
+.mineradio-dock .control-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, .92);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: visible;
+  cursor: pointer
+}
+
+.mineradio-dock .control-title-text {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.mineradio-dock .control-title-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  max-width: none
+}
+
+.mineradio-dock .control-title-badges .tag-source {
+  height: 15px;
+  min-width: 0;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 8px;
+  line-height: 15px;
+  letter-spacing: 0
+}
+
+.mineradio-dock .tag-source.control-source-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  cursor: pointer
+}
+
+.mineradio-dock .control-title-badges .control-source-chip {
+  position: relative;
+  transition: transform .16s, filter .16s, border-color .16s
+}
+
+.mineradio-dock .control-title-badges .control-source-chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.14) saturate(1.12)
+}
+
+.mineradio-dock .control-title-badges .tag-vip {
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: 0
+}
+
+.mineradio-dock .control-source-switcher {
+  position: fixed;
+  z-index: 22;
+  width: 276px;
+  max-width: calc(100vw - 24px);
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  background: linear-gradient(145deg, rgba(16, 17, 22, .86), rgba(7, 8, 12, .90));
+  color: rgba(255, 255, 255, .86);
+  backdrop-filter: blur(28px) saturate(1.18);
+  -webkit-backdrop-filter: blur(28px) saturate(1.18);
+  box-shadow: 0 20px 58px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(.985);
+  transition: opacity .18s, transform .18s;
+  overflow: hidden
+}
+
+.mineradio-dock .control-source-switcher::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .018) 44%, rgba(255, 255, 255, .085));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10), inset 0 10px 28px rgba(255, 255, 255, .045);
+  opacity: .72
+}
+
+.mineradio-dock .control-source-switcher>* {
+  position: relative;
+  z-index: 1
+}
+
+.mineradio-dock .control-source-switcher.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1)
+}
+
+.mineradio-dock .control-source-switcher-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 1px 2px 8px;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1
+}
+
+.mineradio-dock .control-source-switcher-head small {
+  min-width: 0;
+  color: rgba(255, 255, 255, .46);
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap
+}
+
+.mineradio-dock .control-source-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px
+}
+
+.mineradio-dock .control-source-option {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, .07);
+  background: rgba(255, 255, 255, .04);
+  color: rgba(255, 255, 255, .74);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  text-align: left;
+  transition: background .18s, color .18s, border-color .18s, transform .18s
+}
+
+.mineradio-dock .control-source-option:hover {
+  transform: translateY(-1px);
+  color: #fff;
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(var(--fc-accent-rgb), .26)
+}
+
+.mineradio-dock .control-source-option.active {
+  color: #fff;
+  border-color: rgba(var(--fc-accent-rgb), .38);
+  background: rgba(var(--fc-accent-rgb), .12)
+}
+
+.mineradio-dock .control-source-option:focus-visible {
+  border-color: rgba(255, 255, 255, .42);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10)
+}
+
+.mineradio-dock .control-source-option.disabled {
+  opacity: .46;
+  cursor: not-allowed;
+  transform: none !important
+}
+
+.mineradio-dock .control-source-option-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 820
+}
+
+.mineradio-dock .control-source-option small {
+  color: rgba(255, 255, 255, .42);
+  font-size: 10px;
+  font-weight: 760;
+  white-space: nowrap
+}
+
+.mineradio-dock .control-source-option .tag-source {
+  width: 27px;
+  justify-content: center;
+  pointer-events: none
+}
+
+.mineradio-dock .control-artist {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, .48);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer
+}
+
+.mineradio-dock .control-title:hover,
+.mineradio-dock .control-artist:hover {
+  color: #fff;
+  text-shadow: 0 0 16px rgba(0, 245, 212, .20)
+}
+
+.mineradio-dock .ctrl-btn {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 0;
+  border-radius: 11px;
+  color: rgba(255, 255, 255, 0.70);
+  cursor: pointer;
+  transition: color .18s, transform .18s, text-shadow .18s, background .18s, box-shadow .18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  will-change: transform
+}
+
+.mineradio-dock .ctrl-btn:focus {
+  outline: none
+}
+
+.mineradio-dock .ctrl-btn:focus-visible {
+  outline: 1px solid rgba(var(--fc-accent-rgb), .34);
+  outline-offset: 2px
+}
+
+.mineradio-dock .ctrl-btn svg {
+  width: 21px;
+  height: 21px
+}
+
+.mineradio-dock .ctrl-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .045);
+  transform: translateY(-1px);
+  text-shadow: 0 0 10px rgba(0, 245, 212, .12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045)
+}
+
+.mineradio-dock .ctrl-btn:active {
+  transform: translateY(0) scale(.96)
+}
+
+.mineradio-dock .ctrl-btn.active {
+  color: rgba(210, 244, 241, .90);
+  text-shadow: 0 0 12px rgba(0, 245, 212, .16)
+}
+
+.mineradio-dock .ctrl-btn.liked {
+  color: #ff7a90;
+  text-shadow: 0 0 18px rgba(255, 122, 144, .36)
+}
+
+.mineradio-dock .ctrl-btn.busy {
+  opacity: .55;
+  pointer-events: none
+}
+
+@keyframes mineradio-dock-cuefield-ready-pulse {
+  50% { transform: translateY(-1px) scale(1.08) }
+}
+
+@keyframes mineradio-dock-play-mode-pop {
+  0% {
+    opacity: .4;
+    transform: translateY(3px) scale(.84) rotate(-18deg)
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.10) rotate(4deg)
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0)
+  }
+}
+
+.mineradio-dock .volume-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+
+.mineradio-dock .control-quality-chip {
+  height: 15px;
+  align-self: center;
+  flex: 0 0 auto;
+  margin-left: -1px;
+  line-height: 1
+}
+
+.mineradio-dock .control-quality-chip::before {
+  left: -18px;
+  right: -18px;
+  bottom: 7px;
+  height: 118px
+}
+
+.mineradio-dock .volume-control::before {
+  content: '';
+  position: absolute;
+  left: -34px;
+  right: -34px;
+  bottom: 18px;
+  height: 132px;
+  display: none;
+  z-index: 0
+}
+
+.mineradio-dock .volume-control.open::before,
+.mineradio-dock .volume-control:hover::before,
+.mineradio-dock .volume-control:focus-within::before {
+  display: block
+}
+
+.mineradio-dock .volume-control.sibling-suppressed::before,
+.mineradio-dock .volume-control.handoff-closing::before {
+  display: none !important
+}
+
+.mineradio-dock .volume-control.muted .ctrl-btn {
+  color: rgba(255, 255, 255, .38)
+}
+
+.mineradio-dock .volume-popover {
+  position: absolute;
+  left: 50%;
+  bottom: 46px;
+  transform: translateX(-50%) translateY(8px);
+  width: 226px;
+  padding: 10px 12px 11px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  background: rgba(12, 12, 16, .78);
+  backdrop-filter: blur(24px) saturate(1.12);
+  -webkit-backdrop-filter: blur(24px) saturate(1.12);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .07);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 1
+}
+
+.mineradio-dock .volume-control .ctrl-btn,
+.mineradio-dock .quality-control .ctrl-btn,
+.mineradio-dock .lyric-timing-control .ctrl-btn {
+  position: relative;
+  z-index: 2
+}
+
+.mineradio-dock .volume-control.open .volume-popover,
+.mineradio-dock .volume-control:hover .volume-popover,
+.mineradio-dock .volume-control:focus-within .volume-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0)
+}
+
+.mineradio-dock .volume-control.sibling-suppressed .volume-popover,
+.mineradio-dock .volume-control.handoff-closing .volume-popover {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(-50%) translateY(8px) scale(.98) !important
+}
+
+.mineradio-dock #bottom-bar.soft-hidden .lyric-timing-popover {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(-50%) translateY(8px) scale(.98) !important
+}
+
+.mineradio-dock #bottom-bar.soft-hidden .lyric-timing-control::before {
+  display: none !important
+}
+
+.mineradio-dock .control-quality-chip .quality-popover {
+  bottom: 24px
+}
+
+@keyframes mineradio-dock-workflowDash {
+  to { stroke-dashoffset: -22 }
+}
+
+@keyframes mineradio-dock-routeEnergySweep {
+  0% { transform: translateX(0) skewX(-16deg); opacity: 0 }
+  24% { opacity: 1 }
+  100% { transform: translateX(360%) skewX(-16deg); opacity: 0 }
+}
+
+@keyframes mineradio-dock-routeNodePulse {
+  0%, 100% { transform: scale(.86); opacity: .62 }
+  50% { transform: scale(1.12); opacity: 1 }
+}
+
+.mineradio-dock .volume-main-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 9px
+}
+
+.mineradio-dock #volume-slider {
+  width: 100%;
+  accent-color: var(--fc-accent);
+  cursor: pointer
+}
+
+.mineradio-dock #volume-value {
+  width: 34px;
+  text-align: right;
+  font-size: 10px;
+  color: rgba(255, 255, 255, .52);
+  font-variant-numeric: tabular-nums
+}
+
+@keyframes mineradio-dock-queue-shimmer {
+  0% {
+    background-position: 120% 0
+  }
+
+  100% {
+    background-position: -120% 0
+  }
+}
+
+.mineradio-dock #play-btn {
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, .96);
+  background: rgba(0, 0, 0, .10);
+  transition: transform .20s cubic-bezier(.16, 1, .3, 1), background .20s, box-shadow .20s, filter .20s;
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .34), inset 0 0 10px 4px rgba(255, 255, 255, .13), 0 10px 30px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(12px) saturate(1.8) brightness(1.16);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8) brightness(1.16)
+}
+
+.mineradio-dock.control-glass-svg-ok #play-btn {
+  backdrop-filter: blur(24px) saturate(1) brightness(1);
+  -webkit-backdrop-filter: blur(24px) saturate(1) brightness(1)
+}
+
+.mineradio-dock #play-btn svg {
+  width: 24px;
+  height: 24px
+}
+
+.mineradio-dock #play-btn:hover {
+  background: rgba(255, 255, 255, .055);
+  transform: translateY(-1px) scale(1.012);
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .42), inset 0 0 12px 5px rgba(255, 255, 255, .17), 0 12px 34px rgba(0, 0, 0, .22), 0 0 18px rgba(var(--fc-accent-rgb), .10)
+}
+
+.mineradio-dock #play-btn:active {
+  transform: translateY(0) scale(.965);
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .28), inset 0 0 10px 4px rgba(255, 255, 255, .10), 0 8px 22px rgba(0, 0, 0, .20)
+}
+
+.mineradio-dock #time-display {
+  flex: 0 0 auto;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.50);
+  letter-spacing: .35px;
+  min-width: 86px;
+  text-align: center;
+  font-variant-numeric: tabular-nums
+}
+
+.mineradio-dock.diy-mode #bottom-bar {
+  width: min(1160px, calc(100vw - 148px));
+  left: calc(50% - 34px);
+  bottom: 18px
+}
+
+.mineradio-dock.diy-mode #bottom-bar.stage-mode {
+  width: min(1160px, calc(100vw - 148px));
+  bottom: 18px
+}
+
+@media (max-width: 1180px) {
+
+  .mineradio-dock.diy-mode #bottom-bar,
+  .mineradio-dock.diy-mode #bottom-bar.stage-mode {
+    width: calc(100vw - 142px);
+    padding: 9px 14px 12px;
+    left: calc(50% - 34px)
+  }
+
+  .mineradio-dock.diy-mode #controls {
+    grid-template-columns: minmax(240px, 1fr) minmax(214px, auto) minmax(260px, auto);
+    gap: 8px
+  }
+
+  .mineradio-dock .control-cluster {
+    gap: 8px
+  }
+
+  .mineradio-dock .control-cover {
+    width: 44px;
+    height: 44px
+  }
+
+  .mineradio-dock .control-meta {
+    max-width: 138px
+  }
+
+  .mineradio-dock .ctrl-btn {
+    width: 32px;
+    height: 32px
+  }
+
+  .mineradio-dock .ctrl-btn svg {
+    width: 19px;
+    height: 19px
+  }
+
+  .mineradio-dock.diy-mode #play-btn {
+    width: 54px;
+    height: 54px
+  }
+
+  .mineradio-dock.diy-mode #time-display {
+    min-width: 72px;
+    font-size: 11px
+  }
+}
+
+@media (max-width: 920px) {
+
+  .mineradio-dock #bottom-bar,
+  .mineradio-dock #bottom-bar.stage-mode {
+    width: calc(100vw - 28px);
+    padding: 9px 14px 12px
+  }
+
+  .mineradio-dock #controls {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 8px
+  }
+
+  .mineradio-dock .control-cluster {
+    gap: 8px;
+    height: 56px
+  }
+
+  .mineradio-dock .control-cover {
+    width: 44px;
+    height: 44px
+  }
+
+  .mineradio-dock .control-meta {
+    max-width: 170px
+  }
+
+  .mineradio-dock .control-title {
+    font-size: 12.5px
+  }
+
+  .mineradio-dock .control-artist {
+    font-size: 11px
+  }
+
+  .mineradio-dock .ctrl-btn {
+    width: 32px;
+    height: 32px
+  }
+
+  .mineradio-dock .ctrl-btn svg {
+    width: 19px;
+    height: 19px
+  }
+
+  .mineradio-dock .volume-popover {
+    bottom: 42px
+  }
+
+  .mineradio-dock #play-btn {
+    width: 54px;
+    height: 54px
+  }
+
+  .mineradio-dock #time-display {
+    display: none
+  }
+}
+
+@media (max-width: 620px) {
+
+  .mineradio-dock #bottom-bar,
+  .mineradio-dock #bottom-bar.stage-mode {
+    width: calc(100vw - 20px)
+  }
+
+  .mineradio-dock #controls {
+    grid-template-columns: 1fr
+  }
+
+  .mineradio-dock .control-cluster {
+    grid-column: 1 !important;
+    justify-content: center
+  }
+
+  .mineradio-dock .control-cluster.transport {
+    order: 1
+  }
+
+  .mineradio-dock .control-cluster.actions {
+    order: 2
+  }
+
+  .mineradio-dock .control-cluster.modes {
+    order: 3
+  }
+
+  .mineradio-dock .control-track {
+    display: none
+  }
+}
+.mineradio-dock #bottom-bar,
+.mineradio-dock #bottom-bar.stage-mode,
+.mineradio-dock.simple-mode #bottom-bar {
+  box-sizing: border-box;
+  width: min(1120px, calc(100vw - clamp(20px, 5vw, 72px)));
+  padding: clamp(8px, 1.2vw, 11px) clamp(12px, 2.2vw, 24px) clamp(10px, 1.35vw, 14px);
+}
+
+.mineradio-dock.diy-mode #bottom-bar,
+.mineradio-dock.diy-mode #bottom-bar.stage-mode {
+  left: 50%;
+  width: min(1120px, calc(100vw - clamp(28px, 8vw, 148px)));
+}
+
+.mineradio-dock #controls,
+.mineradio-dock.simple-mode #controls,
+.mineradio-dock.diy-mode #controls {
+  grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
+  gap: clamp(8px, 1.7vw, 18px);
+}
+
+.mineradio-dock .control-cluster {
+  min-width: 0
+}
+
+.mineradio-dock .control-cluster.actions {
+  justify-content: flex-start;
+  overflow: visible;
+}
+
+.mineradio-dock .control-cluster.transport {
+  justify-self: center;
+  justify-content: center;
+  width: max-content;
+  gap: clamp(8px, 1.1vw, 13px);
+}
+
+.mineradio-dock .control-cluster.modes {
+  justify-content: flex-end;
+  overflow: visible;
+}
+
+.mineradio-dock .control-track {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mineradio-dock .control-meta {
+  max-width: min(320px, 100%);
+}
+
+@media (max-width:1180px) {
+
+  .mineradio-dock.diy-mode #bottom-bar,
+  .mineradio-dock.diy-mode #bottom-bar.stage-mode {
+    left: 50%;
+    width: calc(100vw - clamp(28px, 8vw, 142px));
+  }
+
+  .mineradio-dock .control-meta {
+    max-width: min(220px, 100%)
+  }
+}
+
+@media (max-width:920px) {
+
+  .mineradio-dock #bottom-bar,
+  .mineradio-dock #bottom-bar.stage-mode,
+  .mineradio-dock.simple-mode #bottom-bar,
+  .mineradio-dock.diy-mode #bottom-bar,
+  .mineradio-dock.diy-mode #bottom-bar.stage-mode {
+    width: calc(100vw - 28px);
+  }
+
+  .mineradio-dock #controls,
+  .mineradio-dock.simple-mode #controls,
+  .mineradio-dock.diy-mode #controls {
+    grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
+  }
+
+  .mineradio-dock .control-meta {
+    max-width: min(170px, 100%)
+  }
+}
+
+@media (max-width:720px) {
+  .mineradio-dock .control-cover {
+    display: none
+  }
+
+  .mineradio-dock .control-meta {
+    max-width: min(132px, 100%)
+  }
+
+  .mineradio-dock .control-cluster.modes {
+    gap: 6px
+  }
+}
+
+@media (max-width:1180px) {
+  .mineradio-dock.diy-mode .control-cluster.modes {
+    gap: 7px
+  }
+
+  .mineradio-dock.diy-mode #controls {
+    gap: 10px
+  }
+}
+
+@media (max-width:1040px) {
+
+  .mineradio-dock.diy-mode #time-display,
+  .mineradio-dock.diy-mode #controls-hide-btn {
+    display: none !important
+  }
+
+  .mineradio-dock.diy-mode .control-track {
+    max-width: 260px
+  }
+}
+
+@media (max-width:940px) {
+
+  .mineradio-dock.diy-mode #volume-control {
+    display: none !important
+  }
+}
+
+@media (max-width:620px) {
+
+  .mineradio-dock #controls,
+  .mineradio-dock.simple-mode #controls,
+  .mineradio-dock.diy-mode #controls {
+    grid-template-columns: 1fr;
+  }
+
+  .mineradio-dock .control-cluster.actions,
+  .mineradio-dock .control-cluster.transport,
+  .mineradio-dock .control-cluster.modes {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+.mineradio-dock.immersive-mode #bottom-bar.visible {
+  z-index: 32;
+  bottom: 22px;
+  width: min(620px, calc(100vw - 56px));
+  padding: 10px 20px 13px;
+  gap: 9px;
+  border-radius: 22px;
+  background: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, .13), transparent 35%), linear-gradient(112deg, rgba(255, 255, 255, .060), rgba(12, 15, 18, .45) 52%, rgba(2, 4, 7, .58));
+  border-color: rgba(255, 255, 255, .060);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, .32), 0 0 42px rgba(152, 221, 255, .055), inset 0 1px 0 rgba(255, 255, 255, .15), inset 0 -22px 58px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(46px) saturate(1.36);
+  -webkit-backdrop-filter: blur(46px) saturate(1.36)
+}
+
+.mineradio-dock.immersive-mode #bottom-bar.soft-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(96px) scale(.97);
+  filter: none;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none
+}
+
+.mineradio-dock.immersive-mode #progress-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, .10)
+}
+
+.mineradio-dock.immersive-mode #progress-bar:hover,
+.mineradio-dock.immersive-mode #progress-bar.is-dragging {
+  height: 5px;
+  background: rgba(255, 255, 255, .14)
+}
+
+.mineradio-dock.immersive-mode #controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px
+}
+
+.mineradio-dock.immersive-mode .control-cluster {
+  grid-column: auto !important;
+  justify-content: center;
+  height: 64px;
+  gap: 14px
+}
+
+.mineradio-dock.immersive-mode .control-cluster.actions {
+  display: none
+}
+
+.mineradio-dock.immersive-mode .control-cluster.transport {
+  display: flex;
+  order: 1
+}
+
+.mineradio-dock.immersive-mode .control-cluster.modes {
+  display: flex;
+  order: 2;
+  gap: 14px
+}
+
+.mineradio-dock.immersive-mode .control-track,
+.mineradio-dock.immersive-mode #mini-queue-btn,
+.mineradio-dock.immersive-mode #volume-control,
+.mineradio-dock.immersive-mode #controls-hide-btn,
+.mineradio-dock.immersive-mode .control-divider {
+  display: none !important
+}
+
+.mineradio-dock.immersive-mode #mini-queue-popover {
+  display: none !important
+}
+
+.mineradio-dock.immersive-mode .ctrl-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px
+}
+
+.mineradio-dock.immersive-mode .ctrl-btn svg {
+  width: 22px;
+  height: 22px
+}
+
+.mineradio-dock.immersive-mode #play-btn {
+  width: 64px;
+  height: 64px
+}
+
+.mineradio-dock.immersive-mode #play-btn svg {
+  width: 25px;
+  height: 25px
+}
+
+.mineradio-dock.immersive-mode #time-display {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  min-width: 86px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, .58)
+}
+
+@media (max-width: 620px) {
+  .mineradio-dock.immersive-mode #bottom-bar {
+    width: calc(100vw - 20px);
+    padding: 10px 12px 12px
+  }
+
+  .mineradio-dock.immersive-mode #controls {
+    gap: 10px
+  }
+
+  .mineradio-dock.immersive-mode .control-cluster {
+    gap: 10px;
+    height: 60px
+  }
+
+  .mineradio-dock.immersive-mode .ctrl-btn {
+    width: 36px;
+    height: 36px
+  }
+
+  .mineradio-dock.immersive-mode .ctrl-btn svg {
+    width: 20px;
+    height: 20px
+  }
+
+  .mineradio-dock.immersive-mode #play-btn {
+    width: 58px;
+    height: 58px
+  }
+
+  .mineradio-dock.immersive-mode #time-display {
+    min-width: 72px;
+    font-size: 10.5px
+  }
+}
+
+@media (max-width: 420px) {
+  .mineradio-dock.immersive-mode #time-display {
+    display: none
+  }
+}
+
+@keyframes mineradio-dock-login-easter-eye-tap {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0) }
+  18% { transform: translate3d(-5px, 1px, 0) rotate(-2deg) }
+  38% { transform: translate3d(6px, -1px, 0) rotate(2.4deg) }
+  58% { transform: translate3d(-4px, 0, 0) rotate(-1.5deg) }
+  78% { transform: translate3d(2px, 0, 0) rotate(.8deg) }
+}
+
+@keyframes mineradio-dock-login-easter-error-shake {
+  0%, 100% { margin-left: 0 }
+  18% { margin-left: -8px }
+  38% { margin-left: 7px }
+  58% { margin-left: -5px }
+  78% { margin-left: 3px }
+}
+
+@keyframes mineradio-dock-login-easter-world-float {
+  0% { transform: translate3d(0, calc(0px - var(--float-distance, 10px)), 0) scale(.992) }
+  48% { transform: translate3d(0, 2px, 0) scale(1.012) }
+  100% { transform: translate3d(0, var(--float-distance, 10px), 0) scale(.998) }
+}
+
+@keyframes mineradio-dock-loginNodeBreathe {
+  0%, 100% { filter: brightness(1); transform: translateY(0) }
+  50% { filter: brightness(1.18); transform: translateY(-1px) }
+}
+
+@keyframes mineradio-dock-spin {
+  to {
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes mineradio-dock-visual-guide-scan {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: .26
+  }
+
+  42% {
+    opacity: .72
+  }
+
+  70% {
+    transform: translateY(82px);
+    opacity: .18
+  }
+}
+
+.mineradio-dock.desktop-shell.diy-mode #bottom-bar,
+.mineradio-dock.desktop-shell.diy-mode #bottom-bar.stage-mode {
+  left: 50%;
+  width: min(1080px, calc(100vw - 72px))
+}
+
+@keyframes mineradio-dock-fx-panel-in {
+  0% {
+    opacity: 0;
+    transform: translateX(32px) translateY(18px) scale(.96);
+    filter: blur(8px)
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+    filter: blur(0)
+  }
+}
+
+@keyframes mineradio-dock-fx-panel-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0) translateY(0) scale(1);
+    filter: blur(0)
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(24px) translateY(12px) scale(.97);
+    filter: blur(6px)
+  }
+}
+
+@keyframes mineradio-dock-preset-card-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(.6) rotate(0deg)
+  }
+
+  35% {
+    opacity: 1
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.25) rotate(12deg)
+  }
+}
+
+@keyframes mineradio-dock-wallpaper-engine-spin {
+  to { transform: rotate(360deg) }
+}
+
+@keyframes mineradio-dock-mineradio-queue-loading-spin {
+  to { transform: rotate(360deg) }
+}
+
+.mineradio-dock #play-btn {
+  border-color: rgba(var(--fc-accent-rgb), .24) !important
+}
+
+.mineradio-dock #play-btn:hover,
+.mineradio-dock .ctrl-btn:hover {
+  border-color: rgba(var(--fc-accent-rgb), .42) !important;
+  background: rgba(var(--fc-accent-rgb), .085) !important;
+  box-shadow: 0 14px 38px rgba(var(--fc-accent-rgb), .10), inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+  color: #fff
+}
+
+.mineradio-dock #bottom-bar .ctrl-btn:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .055) 44%, rgba(var(--fc-accent-rgb), .070)) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .14), 0 0 18px rgba(var(--fc-accent-rgb), .075), inset 0 1px 0 rgba(255, 255, 255, .30), inset 0 -1px 0 rgba(255, 255, 255, .08) !important;
+  color: #fff
+}
+
+.mineradio-dock #play-btn {
+  border: 0 !important;
+  background: rgba(0, 0, 0, .10) !important;
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .34), inset 0 0 10px 4px rgba(255, 255, 255, .13), 0 10px 30px rgba(0, 0, 0, .18) !important
+}
+
+.mineradio-dock #play-btn:hover {
+  background: rgba(255, 255, 255, .055) !important;
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, .42), inset 0 0 12px 5px rgba(255, 255, 255, .17), 0 12px 34px rgba(0, 0, 0, .22), 0 0 18px rgba(var(--fc-accent-rgb), .10) !important;
+  color: #fff
+}
+.mineradio-dock .volume-popover,
+.mineradio-dock .control-source-switcher {
+  background: var(--saved-panel-glass-bg) !important;
+  border-color: transparent !important;
+  box-shadow: var(--saved-panel-glass-shadow) !important;
+  backdrop-filter: var(--saved-panel-glass-filter) !important;
+  -webkit-backdrop-filter: var(--saved-panel-glass-filter) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-results,
+.mineradio-dock.control-glass-svg-ok #fx-panel,
+.mineradio-dock.control-glass-svg-ok #playlist-panel,
+.mineradio-dock.control-glass-svg-ok #upload-tip,
+.mineradio-dock.control-glass-svg-ok #trial-banner,
+.mineradio-dock.control-glass-svg-ok #toast,
+.mineradio-dock.control-glass-svg-ok #cuefield-feedback,
+.mineradio-dock.control-glass-svg-ok #source-fallback-notice,
+.mineradio-dock.control-glass-svg-ok #ai-depth-chip,
+.mineradio-dock.control-glass-svg-ok #beat-chip,
+.mineradio-dock.control-glass-svg-ok .modal,
+.mineradio-dock.control-glass-svg-ok .modal.update-modal,
+.mineradio-dock.control-glass-svg-ok .track-detail-modal,
+.mineradio-dock.control-glass-svg-ok .cover-color-pop,
+.mineradio-dock.control-glass-svg-ok .color-lab-pop,
+.mineradio-dock.control-glass-svg-ok .visual-guide-card,
+.mineradio-dock.control-glass-svg-ok .volume-popover,
+.mineradio-dock.control-glass-svg-ok .quality-popover,
+.mineradio-dock.control-glass-svg-ok .lyric-timing-popover,
+.mineradio-dock.control-glass-svg-ok .mini-queue-popover,
+.mineradio-dock.control-glass-svg-ok .home-hero,
+.mineradio-dock.control-glass-svg-ok .home-card,
+.mineradio-dock.control-glass-svg-ok .home-tile,
+.mineradio-dock.control-glass-svg-ok .home-mosaic-cell,
+.mineradio-dock.control-glass-svg-ok .pl-inline-detail,
+.mineradio-dock.control-glass-svg-ok .local-beat-track,
+.mineradio-dock.control-glass-svg-ok .custom-lyric-track,
+.mineradio-dock.control-glass-svg-ok .cover-crop-stage,
+.mineradio-dock.control-glass-svg-ok #drop-overlay .drop-text {
+  backdrop-filter: var(--saved-panel-glass-svg-filter) !important;
+  -webkit-backdrop-filter: var(--saved-panel-glass-svg-filter) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .control-source-switcher {
+  backdrop-filter: var(--saved-panel-glass-filter) !important;
+  -webkit-backdrop-filter: var(--saved-panel-glass-filter) !important
+}
+
+.mineradio-dock.control-glass-svg-ok .icon-btn,
+.mineradio-dock.control-glass-svg-ok #fx-fab,
+.mineradio-dock.control-glass-svg-ok .user-capsule-hide-btn,
+.mineradio-dock.control-glass-svg-ok .fx-mini-btn,
+.mineradio-dock.control-glass-svg-ok .fx-toggle,
+.mineradio-dock.control-glass-svg-ok .fx-seg button,
+.mineradio-dock.control-glass-svg-ok .panel-tab,
+.mineradio-dock.control-glass-svg-ok .preset-card,
+.mineradio-dock.control-glass-svg-ok .lyric-color-row,
+.mineradio-dock.control-glass-svg-ok .fx-slider,
+.mineradio-dock.control-glass-svg-ok .fx-fold,
+.mineradio-dock.control-glass-svg-ok .quality-option,
+.mineradio-dock.control-glass-svg-ok .modal-btn,
+.mineradio-dock.control-glass-svg-ok .visual-guide-actions button,
+.mineradio-dock.control-glass-svg-ok .home-chip,
+.mineradio-dock.control-glass-svg-ok .pl-card,
+.mineradio-dock.control-glass-svg-ok .queue-item,
+.mineradio-dock.control-glass-svg-ok .mini-queue-item,
+.mineradio-dock.control-glass-svg-ok .pl-detail-row,
+.mineradio-dock.control-glass-svg-ok .pl-detail-play,
+.mineradio-dock.control-glass-svg-ok .local-beat-tab,
+.mineradio-dock.control-glass-svg-ok .search-history-chip,
+.mineradio-dock.control-glass-svg-ok .search-result .add-btn,
+.mineradio-dock.control-glass-svg-ok .song-action-btn,
+.mineradio-dock.control-glass-svg-ok .qi-act button,
+.mineradio-dock.control-glass-svg-ok .mini-queue-remove {
+  backdrop-filter: var(--saved-button-glass-svg-filter) !important;
+  -webkit-backdrop-filter: var(--saved-button-glass-svg-filter) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .home-hero,
+.mineradio-dock.control-glass-svg-ok .home-card,
+.mineradio-dock.control-glass-svg-ok .home-tile,
+.mineradio-dock.control-glass-svg-ok .home-mosaic-cell {
+  backdrop-filter: var(--saved-panel-glass-svg-filter) !important;
+  -webkit-backdrop-filter: var(--saved-panel-glass-svg-filter) !important
+}
+
+.mineradio-dock.control-glass-svg-ok #search-results,
+.mineradio-dock.control-glass-svg-ok #fx-panel,
+.mineradio-dock.control-glass-svg-ok #upload-tip,
+.mineradio-dock.control-glass-svg-ok #trial-banner,
+.mineradio-dock.control-glass-svg-ok #toast,
+.mineradio-dock.control-glass-svg-ok #cuefield-feedback,
+.mineradio-dock.control-glass-svg-ok #source-fallback-notice,
+.mineradio-dock.control-glass-svg-ok #ai-depth-chip,
+.mineradio-dock.control-glass-svg-ok #beat-chip,
+.mineradio-dock.control-glass-svg-ok .modal,
+.mineradio-dock.control-glass-svg-ok .modal.update-modal,
+.mineradio-dock.control-glass-svg-ok .track-detail-modal,
+.mineradio-dock.control-glass-svg-ok .cover-color-pop,
+.mineradio-dock.control-glass-svg-ok .color-lab-pop,
+.mineradio-dock.control-glass-svg-ok .visual-guide-card,
+.mineradio-dock.control-glass-svg-ok .home-hero,
+.mineradio-dock.control-glass-svg-ok .home-card,
+.mineradio-dock.control-glass-svg-ok .home-tile,
+.mineradio-dock.control-glass-svg-ok .home-mosaic-cell,
+.mineradio-dock.control-glass-svg-ok .pl-inline-detail,
+.mineradio-dock.control-glass-svg-ok .local-beat-track,
+.mineradio-dock.control-glass-svg-ok .custom-lyric-track,
+.mineradio-dock.control-glass-svg-ok .cover-crop-stage,
+.mineradio-dock.control-glass-svg-ok #drop-overlay .drop-text {
+  backdrop-filter: var(--panel-glass-filter) !important;
+  -webkit-backdrop-filter: var(--panel-glass-filter) !important;
+}
+
+.mineradio-dock .icon-btn:not(.ctrl-btn) {
+  background: var(--panel-button-bg) !important;
+  border-color: rgba(255, 255, 255, .070) !important;
+  backdrop-filter: blur(16px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.18) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .icon-btn:not(.ctrl-btn),
+.mineradio-dock.control-glass-svg-ok #fx-fab,
+.mineradio-dock.control-glass-svg-ok .user-capsule-hide-btn,
+.mineradio-dock.control-glass-svg-ok .fx-mini-btn,
+.mineradio-dock.control-glass-svg-ok .fx-toggle,
+.mineradio-dock.control-glass-svg-ok .fx-seg button,
+.mineradio-dock.control-glass-svg-ok .panel-tab,
+.mineradio-dock.control-glass-svg-ok .preset-card,
+.mineradio-dock.control-glass-svg-ok .lyric-color-row,
+.mineradio-dock.control-glass-svg-ok .fx-slider,
+.mineradio-dock.control-glass-svg-ok .fx-fold,
+.mineradio-dock.control-glass-svg-ok .quality-option,
+.mineradio-dock.control-glass-svg-ok .modal-btn,
+.mineradio-dock.control-glass-svg-ok .visual-guide-actions button,
+.mineradio-dock.control-glass-svg-ok .home-chip,
+.mineradio-dock.control-glass-svg-ok .local-beat-tab,
+.mineradio-dock.control-glass-svg-ok .search-history-chip,
+.mineradio-dock.control-glass-svg-ok .search-result .add-btn,
+.mineradio-dock.control-glass-svg-ok .song-action-btn {
+  backdrop-filter: blur(16px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.18) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #playlist-panel {
+  background: rgba(12, 12, 18, .42) !important;
+  border-color: rgba(255, 255, 255, .08) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .45) !important;
+  backdrop-filter: blur(40px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.4) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #home-btn,
+.mineradio-dock.control-glass-svg-ok #upload-btn,
+.mineradio-dock.control-glass-svg-ok #visual-guide-btn,
+.mineradio-dock.control-glass-svg-ok #fx-fab,
+.mineradio-dock.control-glass-svg-ok #top-right .icon-btn {
+  backdrop-filter: var(--saved-button-glass-svg-filter) !important;
+  -webkit-backdrop-filter: var(--saved-button-glass-svg-filter) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-results,
+.mineradio-dock.control-glass-svg-ok #playlist-panel,
+.mineradio-dock.control-glass-svg-ok #fx-panel {
+  backdrop-filter: blur(22px) saturate(1.16) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.16) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-results {
+  backdrop-filter: blur(22px) saturate(1.16) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.16) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .fx-mini-btn,
+.mineradio-dock.control-glass-svg-ok .fx-toggle,
+.mineradio-dock.control-glass-svg-ok .fx-seg button,
+.mineradio-dock.control-glass-svg-ok .search-mode-tabs button,
+.mineradio-dock.control-glass-svg-ok .panel-tab,
+.mineradio-dock.control-glass-svg-ok .preset-card,
+.mineradio-dock.control-glass-svg-ok .lyric-color-row,
+.mineradio-dock.control-glass-svg-ok .quality-option,
+.mineradio-dock.control-glass-svg-ok .modal-btn,
+.mineradio-dock.control-glass-svg-ok .visual-guide-actions button,
+.mineradio-dock.control-glass-svg-ok .home-chip,
+.mineradio-dock.control-glass-svg-ok .pl-card,
+.mineradio-dock.control-glass-svg-ok .queue-item,
+.mineradio-dock.control-glass-svg-ok .mini-queue-item,
+.mineradio-dock.control-glass-svg-ok .pl-detail-row,
+.mineradio-dock.control-glass-svg-ok .pl-detail-play,
+.mineradio-dock.control-glass-svg-ok .local-beat-tab,
+.mineradio-dock.control-glass-svg-ok .search-history-chip,
+.mineradio-dock.control-glass-svg-ok .search-result .add-btn,
+.mineradio-dock.control-glass-svg-ok .song-action-btn,
+.mineradio-dock.control-glass-svg-ok .qi-act button,
+.mineradio-dock.control-glass-svg-ok .mini-queue-remove {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.mineradio-dock .control-artist {
+  color: rgba(255, 255, 255, .92) !important;
+}
+
+.mineradio-dock .control-artist:hover {
+  color: #fff !important;
+  text-shadow: none !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .icon-btn,
+.mineradio-dock.control-glass-svg-ok .fx-mini-btn,
+.mineradio-dock.control-glass-svg-ok .fx-toggle,
+.mineradio-dock.control-glass-svg-ok .fx-seg button,
+.mineradio-dock.control-glass-svg-ok .panel-tab,
+.mineradio-dock.control-glass-svg-ok .preset-card,
+.mineradio-dock.control-glass-svg-ok .lyric-color-row,
+.mineradio-dock.control-glass-svg-ok .quality-option,
+.mineradio-dock.control-glass-svg-ok .modal-btn,
+.mineradio-dock.control-glass-svg-ok .visual-guide-actions button,
+.mineradio-dock.control-glass-svg-ok .home-chip,
+.mineradio-dock.control-glass-svg-ok .pl-card,
+.mineradio-dock.control-glass-svg-ok .queue-item,
+.mineradio-dock.control-glass-svg-ok .mini-queue-item,
+.mineradio-dock.control-glass-svg-ok .pl-detail-row,
+.mineradio-dock.control-glass-svg-ok .pl-detail-play,
+.mineradio-dock.control-glass-svg-ok .local-beat-tab,
+.mineradio-dock.control-glass-svg-ok .search-history-chip,
+.mineradio-dock.control-glass-svg-ok .search-result .add-btn,
+.mineradio-dock.control-glass-svg-ok .song-action-btn,
+.mineradio-dock.control-glass-svg-ok .qi-act button,
+.mineradio-dock.control-glass-svg-ok .mini-queue-remove {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .home-hero,
+.mineradio-dock.control-glass-svg-ok .home-card,
+.mineradio-dock.control-glass-svg-ok .home-tile,
+.mineradio-dock.control-glass-svg-ok .home-mosaic-cell,
+.mineradio-dock.control-glass-svg-ok .modal,
+.mineradio-dock.control-glass-svg-ok .track-detail-modal,
+.mineradio-dock.control-glass-svg-ok .visual-guide-card,
+.mineradio-dock.control-glass-svg-ok .volume-popover,
+.mineradio-dock.control-glass-svg-ok .quality-popover,
+.mineradio-dock.control-glass-svg-ok .lyric-timing-popover,
+.mineradio-dock.control-glass-svg-ok .mini-queue-popover,
+.mineradio-dock.control-glass-svg-ok .pl-inline-detail {
+  backdrop-filter: blur(22px) saturate(1.16) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.16) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #home-btn,
+.mineradio-dock.control-glass-svg-ok #upload-btn,
+.mineradio-dock.control-glass-svg-ok #visual-guide-btn,
+.mineradio-dock.control-glass-svg-ok #fx-fab,
+.mineradio-dock.control-glass-svg-ok #top-right .icon-btn {
+  backdrop-filter: var(--saved-button-glass-svg-filter) !important;
+  -webkit-backdrop-filter: var(--saved-button-glass-svg-filter) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #top-right #user-btn.multi-account,
+.mineradio-dock.control-glass-svg-ok #top-right #user-btn.multi-account:hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: none !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .top-account-pill::before {
+  backdrop-filter: url(#mineradio-account-pill-glass-filter) saturate(1) !important;
+  -webkit-backdrop-filter: url(#mineradio-account-pill-glass-filter) saturate(1) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .search-mode-tabs button,
+.mineradio-dock.control-glass-svg-ok .search-history-chip {
+  background: var(--saved-button-glass-bg) !important;
+  border-color: transparent !important;
+  color: rgba(var(--fc-accent-rgb), .78) !important;
+  box-shadow: var(--saved-button-glass-shadow) !important;
+  backdrop-filter: url(#mineradio-search-pill-glass-filter) saturate(1) !important;
+  -webkit-backdrop-filter: url(#mineradio-search-pill-glass-filter) saturate(1) !important;
+  overflow: visible !important;
+}
+
+.mineradio-dock.control-glass-svg-ok .search-mode-tabs button:hover,
+.mineradio-dock.control-glass-svg-ok .search-mode-tabs button.active,
+.mineradio-dock.control-glass-svg-ok .search-history-chip:hover {
+  background: var(--saved-button-glass-hover-bg) !important;
+  color: rgba(var(--fc-accent-rgb), .98) !important;
+  border-color: transparent !important;
+  box-shadow: var(--saved-button-glass-hover-shadow) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-area .search-mode-tabs {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important
+}
+
+.mineradio-dock.control-glass-svg-ok #search-area.peek #search-box {
+  backdrop-filter: url(#mineradio-search-box-glass-filter) saturate(1) !important;
+  -webkit-backdrop-filter: url(#mineradio-search-box-glass-filter) saturate(1) !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-box::before {
+  content: none !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-results.show:not(.search-history-surface) {
+  position: relative;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, .12) !important;
+  border-top-color: rgba(255, 255, 255, .22) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .11), rgba(18, 20, 26, .28) 42%, rgba(0, 0, 0, .18)) !important;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .18), inset 0 0 34px rgba(255, 255, 255, .045) !important;
+  backdrop-filter: blur(34px) saturate(1.34) brightness(1.08) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(1.34) brightness(1.08) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.mineradio-dock.control-glass-svg-ok #search-results.search-history-surface {
+  position: relative;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, .12) !important;
+  border-top-color: rgba(255, 255, 255, .22) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .11), rgba(18, 20, 26, .28) 42%, rgba(0, 0, 0, .18)) !important;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .18), inset 0 0 34px rgba(255, 255, 255, .045) !important;
+  backdrop-filter: blur(34px) saturate(1.34) brightness(1.08) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(1.34) brightness(1.08) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.mineradio-dock.control-glass-svg-ok #visual-guide-btn {
+  color: rgba(184, 188, 196, .58) !important;
+  border-color: rgba(255, 255, 255, .08) !important;
+  background: rgba(36, 38, 44, .46) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #visual-guide-btn:hover {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .24) !important;
+  background: rgba(72, 76, 86, .72) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .10) !important;
+}
+
+@keyframes mineradio-dock-lyric-glitch-button-shift {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0)
+  }
+
+  18% {
+    transform: translate3d(-1px, .5px, 0)
+  }
+
+  22% {
+    transform: translate3d(1.4px, -.5px, 0)
+  }
+
+  48% {
+    transform: translate3d(.3px, 0, 0)
+  }
+
+  52% {
+    transform: translate3d(-1.2px, .4px, 0)
+  }
+}
+
+@keyframes mineradio-dock-lyric-glitch-scan {
+  0% {
+    transform: translate3d(-120%, 0, 0);
+    opacity: .18
+  }
+
+  48% {
+    opacity: .72
+  }
+
+  100% {
+    transform: translate3d(130%, 0, 0);
+    opacity: .10
+  }
+}
+
+@keyframes mineradio-dock-lyr-bob {
+
+  0%,
+  100% {
+    transform: translate3d(var(--bx, 0px), 0, 0) rotateX(0deg) rotateY(0deg) scale(1)
+  }
+
+  25% {
+    transform: translate3d(calc(var(--bx, 0px) + 6px), -7px, 12px) rotateX(2deg) rotateY(-1.5deg) scale(1.01)
+  }
+
+  50% {
+    transform: translate3d(var(--bx, 0px), 3px, 0) rotateX(-1.5deg) rotateY(0deg) scale(.99)
+  }
+
+  75% {
+    transform: translate3d(calc(var(--bx, 0px) - 6px), -4px, 8px) rotateX(1.2deg) rotateY(1.5deg) scale(1.005)
+  }
+}
+
+@keyframes mineradio-dock-lyr-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--inx, -60px), var(--iny, 40px), -160px) rotateX(var(--inrx, 28deg)) rotateY(var(--inry, -22deg)) scale(.7);
+    filter: blur(14px) drop-shadow(0 4px 22px rgba(143, 233, 255, .30))
+  }
+
+  55% {
+    opacity: 1;
+    filter: blur(0) drop-shadow(0 4px 22px rgba(143, 233, 255, .30))
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(var(--bx, 0px), 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
+    filter: blur(0) drop-shadow(0 4px 22px rgba(143, 233, 255, .30))
+  }
+}
+
+@keyframes mineradio-dock-lyr-out {
+  0% {
+    opacity: 1;
+    transform: translate3d(var(--bx, 0px), 0, 0) rotateX(0) rotateY(0) scale(1);
+    filter: blur(0)
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--outx, 60px), var(--outy, -40px), -120px) rotateX(var(--outrx, -22deg)) rotateY(var(--outry, 18deg)) scale(.78);
+    filter: blur(10px)
+  }
+}
+
+.mineradio-dock.control-glass-svg-ok #user-btn.multi-account,
+.mineradio-dock.control-glass-svg-ok #user-btn.multi-account:hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: none !important;
+}
+
+.mineradio-dock.control-glass-svg-ok #user-btn.multi-account.external-account-pills,
+.mineradio-dock.control-glass-svg-ok #user-btn.multi-account.external-account-pills:hover {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  max-width: 206px;
+  max-height: calc(100vh - 92px);
+  overflow: visible
+}
+
+@keyframes mineradio-dock-fx-console-search-hit {
+  0%, 100% {
+    outline-color: transparent
+  }
+  18%, 76% {
+    outline-color: rgba(var(--fc-accent-rgb), .96)
+  }
+}
+.mineradio-dock.desktop-wallpaper-hud-prime.desktop-wallpaper-mode.desktop-wallpaper-interactive #bottom-bar {
+  transition: none !important;
+}
+
+.mineradio-dock.desktop-wallpaper-mode.desktop-wallpaper-interactive:not(.empty-home-active):not(.home-controls-locked) #bottom-bar.visible:not(.soft-hidden) {
+  opacity: .91 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateX(-50%) translateY(0) scale(1) !important;
+}
+
+.mineradio-dock.desktop-wallpaper-mode #bottom-bar,
+.mineradio-dock.desktop-wallpaper-mode #bottom-bar.stage-mode,
+.mineradio-dock.desktop-wallpaper-mode.simple-mode #bottom-bar,
+.mineradio-dock.desktop-wallpaper-mode.diy-mode #bottom-bar,
+.mineradio-dock.desktop-wallpaper-mode.diy-mode #bottom-bar.stage-mode,
+.mineradio-dock.desktop-shell.desktop-wallpaper-mode.diy-mode #bottom-bar,
+.mineradio-dock.desktop-shell.desktop-wallpaper-mode.diy-mode #bottom-bar.stage-mode {
+  left: calc(50% + (var(--desktop-safe-left) - var(--desktop-safe-right)) / 2);
+  bottom: calc(var(--desktop-safe-bottom) + 16px);
+  width: min(1120px, calc(100vw - var(--desktop-safe-left) - var(--desktop-safe-right) - 48px));
+}
+
+@media (max-width:720px) {
+
+  .mineradio-dock.desktop-wallpaper-mode #bottom-bar,
+  .mineradio-dock.desktop-wallpaper-mode #bottom-bar.stage-mode,
+  .mineradio-dock.desktop-wallpaper-mode.simple-mode #bottom-bar,
+  .mineradio-dock.desktop-wallpaper-mode.diy-mode #bottom-bar,
+  .mineradio-dock.desktop-wallpaper-mode.diy-mode #bottom-bar.stage-mode,
+  .mineradio-dock.desktop-shell.desktop-wallpaper-mode.diy-mode #bottom-bar,
+  .mineradio-dock.desktop-shell.desktop-wallpaper-mode.diy-mode #bottom-bar.stage-mode {
+    width: calc(100vw - var(--desktop-safe-left) - var(--desktop-safe-right) - 24px);
+  }
+}

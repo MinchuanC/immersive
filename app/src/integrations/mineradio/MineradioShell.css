@@ -1,0 +1,159 @@
+/* Only the host sizing and React adaptations; visual surfaces come from scoped donor CSS. */
+.mineradio-home {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
+    padding: clamp(20px, 3vw, 48px) clamp(20px, 3.2vw, 54px) 144px;
+    color: #fff;
+    font-family: inherit;
+    --fc-accent-rgb: 157, 184, 207;
+}
+.mineradio-home.diy-mode.empty-home-active #empty-home {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    transform: none!important;
+    pointer-events: auto;
+    overflow: visible;
+}
+.mineradio-home #empty-home .empty-home-shell {
+    min-height: 520px;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+.mineradio-home .home-hero { background-size: cover; background-position: center; }
+.mineradio-home #empty-home .daily-review-card { min-height: 420px; }
+.mineradio-home .daily-review-actions button { display: inline-flex; gap: 7px; align-items: center; }
+.mineradio-home .home-card-art { display: grid; place-items: center; }
+.mineradio-home .home-card-art svg { position: relative; z-index: 2; color: rgba(255,255,255,.72); }
+.mineradio-home .home-insight-link { display: inline-flex; gap: 4px; align-items: center; }
+.mineradio-home .home-empty-library {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 100px;
+    padding: 18px;
+    text-align: left;
+    color: rgba(255,255,255,.75);
+    border: 1px dashed rgba(255,255,255,.15);
+    border-radius: 16px;
+    background: rgba(255,255,255,.025);
+    cursor: pointer;
+}
+.mineradio-home .home-empty-library span { font-size: 12px; color: rgba(255,255,255,.44); }
+.mineradio-home .home-discovery-cover { display: grid; place-items: center; }
+/* Lifted cards and focus rings need space outside the donor grid's paint boundary. */
+.mineradio-home #empty-home .empty-home-shell { overflow: visible; contain: layout style; }
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 64px;
+    align-content: center;
+    gap: 6px 16px;
+    min-width: 0;
+    padding: 20px;
+    animation: none!important;
+}
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card .home-card-label,
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card .home-card-title,
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card .home-card-sub { grid-column: 1; max-width: 100%; margin: 0; }
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card .home-card-title { font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; }
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card .home-card-sub { display: block; overflow: visible; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.74); -webkit-line-clamp: unset; }
+.mineradio-home #empty-home .home-grid.home-quick-grid .home-card .home-card-art { position: relative; inset: auto; grid-column: 2; grid-row: 1 / span 3; align-self: center; width: 64px; height: 64px; border-radius: 16px; }
+.mineradio-home #empty-home .daily-review-card:hover { filter: none; }
+.mineradio-home #empty-home .daily-review-card:hover::before { opacity: 1; }
+@media (min-width:761px) and (max-width:1500px) {
+    .mineradio-home #empty-home .home-grid.home-quick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (min-width:761px) and (max-width:1100px) {
+    .mineradio-home #empty-home .home-insight-dock { grid-template-columns: minmax(0,1fr); }
+}
+.mineradio-home button:focus-visible,.mineradio-dock.diy-mode button:focus-visible,.mineradio-dock.diy-mode [role=slider]:focus-visible,.mineradio-dock.diy-mode input:focus-visible { outline: 2px solid rgba(191,224,243,.9); outline-offset: 4px; }
+.mineradio-dock.diy-mode { --fc-accent-rgb: 157,184,207; position: fixed; inset: 0; z-index: 70; pointer-events: none; }
+.mineradio-dock.diy-mode #bottom-bar { position: fixed; z-index: 70; bottom: 18px; width: min(1180px,calc(100vw - 64px)); max-width: calc(100vw - 36px); pointer-events: auto; }
+.mineradio-dock .mineradio-dock-anchor { position: fixed; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; }
+.mineradio-dock.diy-mode .mineradio-dock-anchor #bottom-bar { position: relative; left: auto; bottom: auto; transform: none; transition: none; }
+/* The plate has a short outward bounce; listening targets never scale or move. */
+.mineradio-dock .mineradio-dock-primary,.mineradio-dock .mineradio-dock-shortcuts { display: inline-flex; align-items: center; gap: inherit; }
+.mineradio-dock.diy-mode .mineradio-dock-anchor #bottom-bar.can-compact { width: min(1240px,calc(100vw - 192px)); height: 80px; padding: 0; display: block; overflow: hidden; transition: width 260ms cubic-bezier(.22,1.25,.36,1), height 260ms cubic-bezier(.22,1.25,.36,1); }
+.mineradio-dock.diy-mode #bottom-bar.can-compact #controls { display: contents; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-cluster { position: absolute; height: 44px; bottom: 10px; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-cluster.actions { left: calc(50% - 214px); width: 146px; padding: 0; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-cover { width: 44px; height: 44px; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-artist { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-cluster.transport { left: 50%; transform: translateX(-50%); gap: 5px; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact #play-btn { width: 44px; height: 44px; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-primary .ctrl-btn:hover { transform: none; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-shortcuts { position: absolute; right: calc(100% + 170px); }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-queue { position: absolute; left: calc(100% + 170px); }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-cluster.modes { left: 50%; transform: translateX(-50%); width: min(1240px,calc(100vw - 192px)); padding-right: 20px; gap: 5px; pointer-events: none; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .control-cluster.modes button,.mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-volume { pointer-events: auto; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-library { position: absolute; right: calc(50% + 320px); }
+.mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-experience { position: absolute; right: calc(50% + 364px); }
+.mineradio-dock.diy-mode #bottom-bar.can-compact #volume-slider { width: 48px; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact #time-display { position: absolute; left: calc(50% + 90px); bottom: 0; height: 44px; min-width: 78px; display: flex!important; align-items: center; justify-content: center; font-size: 11px; }
+.mineradio-dock.diy-mode #bottom-bar.can-compact #progress-bar { position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%); width: calc(100% - 64px); height: 3px; margin: 0; }
+.mineradio-dock.diy-mode .mineradio-dock-anchor #bottom-bar.can-compact.is-compact { width: min(460px,calc(100vw - 192px)); height: 72px; transition-duration: 180ms; transition-timing-function: cubic-bezier(.32,.72,0,1); }
+.mineradio-dock.diy-mode #bottom-bar.is-compact .control-cluster.modes > :not(#time-display),
+.mineradio-dock.diy-mode #bottom-bar.is-compact [data-dock-extra] { display: none; }
+@media(max-width:1100px) {
+    .mineradio-dock.diy-mode .mineradio-dock-anchor #bottom-bar.can-compact:not(.is-compact) { height: 124px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-shortcuts { right: auto; left: calc(50% - 280px); bottom: 60px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-queue { left: calc(50% - 172px); bottom: 60px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-library { right: auto; left: calc(50% - 128px); bottom: 60px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-experience { right: auto; left: calc(50% - 84px); bottom: 60px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-slots { position: absolute; left: calc(50% - 36px); bottom: 60px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact [data-mineradio-console] { position: absolute; left: calc(50% + 48px); bottom: 60px; }
+    .mineradio-dock.diy-mode #bottom-bar.can-compact .mineradio-dock-settings { position: absolute; left: calc(50% + 92px); bottom: 60px; }
+}
+.mineradio-dock.diy-mode .mineradio-dock-accent { position: absolute; left: 22%; right: 22%; bottom: 3px; height: 1px; border-radius: 1px; background: rgba(var(--fc-accent-rgb),.6); box-shadow: 0 0 12px rgba(var(--fc-accent-rgb),.25); pointer-events: none; }
+.mineradio-dock.diy-mode .mineradio-dock-accent.is-ambient { animation: mineradio-dock-ambient 8s ease-in-out infinite; }
+@keyframes mineradio-dock-ambient { 0%,100% { opacity: .12; } 50% { opacity: .24; } }
+.mineradio-dock.diy-mode #bottom-bar #controls { width: 100%; grid-template-columns: minmax(130px,1fr) max-content max-content; }
+.mineradio-dock.diy-mode .control-cluster { gap: 9px; }
+.mineradio-dock.diy-mode .control-cluster.actions { min-width: 0; }
+.mineradio-dock.diy-mode .control-meta { min-width: 0; text-align: left; }
+.mineradio-dock.diy-mode .control-title { max-width: 100%; padding: 0; text-align: left; border: 0; background: transparent; }
+.mineradio-dock.diy-mode .control-title-text { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mineradio-dock.diy-mode .control-cover { flex-shrink: 0; display: grid; place-items: center; padding: 0; overflow: hidden; color: rgba(255,255,255,.55); border: 0; background: rgba(255,255,255,.035); cursor: pointer; }
+.mineradio-dock.diy-mode .control-cover img { width: 100%; height: 100%; object-fit: cover; }
+.mineradio-dock.diy-mode #progress-fill { width: 100%; transform-origin: left; transform: scaleX(0); transition: none; }
+.mineradio-dock.diy-mode #progress-bar { touch-action: none; }
+.mineradio-dock.diy-mode #progress-bar:hover,.mineradio-dock.diy-mode #progress-bar.is-dragging { height: 4px; }
+.mineradio-dock.diy-mode .mineradio-dock-volume { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,.55); }
+.mineradio-dock.diy-mode .mineradio-dock-slots { display: inline-flex; align-items: center; gap: 2px; }
+.mineradio-dock.diy-mode #progress-bar::before { content: ''; position: absolute; inset: -10px 0; }
+.mineradio-dock.diy-mode #volume-slider { width: 62px; accent-color: #cfdfeb; }
+.mineradio-dock.diy-mode #time-display { min-width: 88px; white-space: nowrap; }
+.mineradio-dock.diy-mode .ctrl-btn:disabled { opacity: .28; cursor: default; pointer-events: none; transform: none; }
+@media(max-width:1250px) {
+    .mineradio-dock.diy-mode #bottom-bar #controls { grid-template-columns: minmax(90px,1fr) max-content max-content; }
+    .mineradio-dock.diy-mode .mineradio-dock-volume { display: none; }
+    .mineradio-dock.diy-mode .control-cluster { gap: 5px; }
+}
+@media(max-width:980px) {
+    .mineradio-dock.diy-mode #bottom-bar { width: calc(100vw - 36px); padding: 8px 16px 12px; }
+    .mineradio-dock.diy-mode #bottom-bar #controls { grid-template-columns: minmax(84px,1fr) max-content max-content; }
+    .mineradio-dock.diy-mode .mineradio-dock-fullscreen,.mineradio-dock.diy-mode #time-display { display: none; }
+    .mineradio-dock.diy-mode .control-cluster { gap: 2px; }
+    .mineradio-dock.diy-mode .control-cover { width: 36px; height: 36px; }
+    .mineradio-dock.diy-mode .control-title { font-size: 12px; }
+}
+@media(max-width:760px) {
+    .mineradio-home.diy-mode.empty-home-active #empty-home { height: auto; }
+    .mineradio-home #empty-home .empty-home-shell { height: auto; grid-template-rows: auto auto auto; overflow: visible; }
+    .mineradio-home #empty-home .daily-review-card { height: auto; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .mineradio-home *,.mineradio-dock.diy-mode :not(.mineradio-dock-accent) { animation: none!important; transition-duration: .001ms!important; }
+}
