@@ -11,6 +11,7 @@ assert.ok(status.profile.endsWith('/test-results/run-desktop/userdata'));
 assert.ok(status.page.startsWith('file:'), 'Use serve --production after localPlaybackSmoke.mjs');
 await windowAction('w.restore();w.show()');
 await c('palette','Visualizer: MineRadio');await c('palette','Background: MineRadio');
+await c('click','.mineradio-dock #control-title');
 if(!(await e(async()=> (await window.electron.getSettings()).LOW_POWER_MODE)))await c('palette','Low Power mode');
 const invalid=await e(async()=>{await window.electron.saveSettings('LOW_POWER_MODE','false');return (await window.electron.getSettings()).LOW_POWER_MODE});assert.equal(invalid,true);
 const focus=await windowAction('w.blur()');await wait(300);
@@ -35,6 +36,9 @@ try {
 await wait(250);assert.equal((await e(()=>window.electron.getBackgroundThrottlingState())).active,true);
 await windowAction('w.setSize(1440,900);w.show()');
 await c('palette','Graphics settings');await c('ss','low-power-settings');await c('press','Escape');
+const lyricsVisible=()=>e(()=>document.querySelector('iframe[title="MineRadio visual stage"]').contentWindow.stageSnapshot.showLyrics);
+for(let attempt=0;attempt<50 && !(await lyricsVisible());attempt++)await wait(100);
+assert.equal(await lyricsVisible(),true,'The player view must expose lyrics before testing restoration');
 await e(()=>{const audio=[...document.querySelectorAll('audio')].find(a=>a.duration===45);audio.currentTime=18;return true;});
 if(await e(()=>[...document.querySelectorAll('audio')].find(a=>a.duration===45).paused))await c('press','Space');
 await windowAction('w.minimize()');await wait(4200);await windowAction('w.restore();w.show()');await wait(350);
