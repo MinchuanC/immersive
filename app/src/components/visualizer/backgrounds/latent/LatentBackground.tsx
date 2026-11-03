@@ -12,6 +12,7 @@ import {
 import { extractRepresentativeColors } from '../../../../utils/colorExtractor';
 import { updatePaperShaderUniforms } from '../../../../utils/paperShaderUniforms';
 import { createPaperShaderReleaseRef, PAPER_SHADER_CONTEXT_ATTRIBUTES } from '../../../../utils/paperShaderContext';
+import { useDesktopSettingsStore } from '../../../../stores/useDesktopSettingsStore';
 import { useFirstFrameDrawn } from '../../styleTransition/firstFrame';
 import { useBlendedColors } from '../useBlendedColors';
 import { beatImpact, downbeatImpact } from '../../../../stores/motionSignals';
@@ -138,6 +139,8 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
     blendMs = 0,
     blendProgress,
 }) => {
+    const lowPowerMode = useDesktopSettingsStore(state => state.lowPowerMode);
+    const maxShaderPixels = lowPowerMode ? 640 * 360 : MAX_SHADER_PIXELS;
     const ditheringRef = useRef<PaperShaderElement | null>(null);
     const meshRef = useRef<PaperShaderElement | null>(null);
     // Stable callback refs: they also lose each shader's WebGL context when it unmounts.
@@ -360,7 +363,7 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
                         grainOverlay={0.01}
                         speed={staticMode ? 0 : tuning.meshSpeed}
                         minPixelRatio={1}
-                        maxPixelCount={MAX_SHADER_PIXELS}
+                        maxPixelCount={maxShaderPixels}
                         webGlContextAttributes={PAPER_SHADER_CONTEXT_ATTRIBUTES}
                         style={{ width: '100%', height: '100%' }}
                     />
@@ -388,7 +391,7 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
                         size={tuning.ditheringSize}
                         speed={staticMode ? 0 : tuning.ditheringSpeed}
                         minPixelRatio={1}
-                        maxPixelCount={MAX_SHADER_PIXELS}
+                        maxPixelCount={maxShaderPixels}
                         webGlContextAttributes={PAPER_SHADER_CONTEXT_ATTRIBUTES}
                         style={{ width: '100%', height: '100%' }}
                     />
