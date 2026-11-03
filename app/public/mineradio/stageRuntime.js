@@ -10,6 +10,25 @@ var stageStaticSkullAsset = null;
 var stageLyricRevision = 0, stageStaticLyricCue = '';
 var stageDirectionRevision = 0, stageStaticDirection = -1;
 var stageRestoringCamera = false;
+var stageRenderedLowPower = false, stagePointBudgets = new WeakMap();
+function stageBudgetPoints(object, lowPower) {
+  if (!object) return;
+  var geometry = object.geometry, budget = stagePointBudgets.get(geometry);
+  if (lowPower && !budget) {
+    var original = geometry.index, count = original ? original.count : geometry.attributes.position.count;
+    var indices = [];
+    for (var i = 0; i < count; i += 4) indices.push(original ? original.getX(i) : i);
+    budget = { original: original, low: new THREE.Uint32BufferAttribute(indices, 1) };
+    stagePointBudgets.set(geometry, budget);
+  }
+  if (!budget) return;
+  var index = lowPower ? budget.low : budget.original;
+  if (geometry.index !== index) {
+    // Release the outgoing GPU index too; the original CPU attributes and geometry stay intact.
+    geometry.dispose();
+    geometry.setIndex(index);
+  }
+}
 var stageConsoleOpen = false, stageConsoleObserver;
 function stageReportConsoleVisibility(open) {
   if (stageConsoleOpen === open) return;
@@ -344,7 +363,7 @@ function stageDraw(now) {
   audio.currentTime = Math.min(audio.duration || Infinity, stageClockAt + (playing ? Math.min(.5, (now - stageReceivedAt) / 1000) : 0));
   var workshop = document.querySelector('#sonic-workshop-layer iframe');
   if (workshop && workshop.contentDocument && workshop.contentDocument.querySelector('canvas')) MineradioStageMotion.holdRealm(workshop.contentWindow, !!reduced);
-  var compositionChanged = !stageFirstDrawn || stageStaticSettings !== stageLastSettings || stageStaticCatalog !== playlistCatalogRevision || stageStaticCover !== coverTex.version || stageStaticViewport !== stageViewportRevision || stageStaticSkullAsset !== skullParticleAsset.data || stageStaticDirection !== stageDirectionRevision;
+  var compositionChanged = stageRenderedLowPower !== !!stageSnapshot.lowPowerMode || !stageFirstDrawn || stageStaticSettings !== stageLastSettings || stageStaticCatalog !== playlistCatalogRevision || stageStaticCover !== coverTex.version || stageStaticViewport !== stageViewportRevision || stageStaticSkullAsset !== skullParticleAsset.data || stageStaticDirection !== stageDirectionRevision;
   var staticChanged = !stageWasReduced || compositionChanged;
   var lyricCue = '';
   if (reduced) {
@@ -403,7 +422,11 @@ function stageDraw(now) {
   }
   var skull = fx.preset === 6, workshopPreset = fx.preset === 8;
   particles.visible = !skull && !workshopPreset && fx.preset !== 3;
-  bloomParticles.visible = particles.visible && fx.bloom && fx.bloomStrength > .01;
+  var lowPower = stageSnapshot.lowPowerMode === true;
+  stageBudgetPoints(particles, lowPower);
+  stageBudgetPoints(floatGroup, lowPower);
+  stageBudgetPoints(skullParticleGroup, lowPower);
+  bloomParticles.visible = !lowPower && particles.visible && fx.bloom && fx.bloomStrength > .01;
   bloomParticles.rotation.copy(particles.rotation);
   var frame = { scene: scene, fx: fx, time: uniforms.uTime.value, screenHeight: innerHeight, dpr: renderer.getPixelRatio(), visualRotation: particles.rotation, visualRotationActive: orbit.rotating, audio: { bass: bass, mid: mid, treble: treble, beat: beatPulse, energy: audioEnergy } };
   if (stageSnapshot.direction) frame.scoreTime = audio.currentTime;
@@ -417,6 +440,7 @@ function stageDraw(now) {
   if (fx.particleLyrics) { if (reduced) stageRefreshLyrics(false); updateStageLyrics3D(reduced ? 0 : dt); }
   renderer.render(scene, camera);
   stageWasReduced = !!reduced;
+  stageRenderedLowPower = lowPower;
   stageStaticLyricCue = lyricCue;
   stageStaticSettings = stageLastSettings; stageStaticCatalog = playlistCatalogRevision; stageStaticCover = coverTex.version; stageStaticViewport = stageViewportRevision; stageRenderedPreset = fx.preset; stageStaticSkullAsset = skullParticleAsset.data;
   if (!stageFirstDrawn) { stageFirstDrawn = true; parent.postMessage({ scope: 'immersive-mineradio', session: stageSession, type: 'drawn' }, '*'); }

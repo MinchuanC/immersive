@@ -84,6 +84,7 @@ exports[`store contract > keeps every localStorage key the stores read or write 
   "local_replaygain_mode",
   "local_track_sort_direction",
   "local_track_sort_field",
+  "low_power_mode",
   "lumiere_tuning",
   "lyrics_custom_font",
   "lyrics_filter_enabled",

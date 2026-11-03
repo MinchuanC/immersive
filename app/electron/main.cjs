@@ -19,6 +19,7 @@ const { createModSystem } = require('./modSystem/modSystem.cjs');
 const { MOD_PROTOCOL_PRIVILEGED_SCHEME } = require('./modSystem/modProtocol.cjs');
 const { createWindowPlaybackHandoffStore } = require('./windowPlaybackHandoff.cjs');
 const { applyTileMemoryBudget } = require('./tileMemoryBudget.cjs');
+const LOW_POWER_MODE_SETTING_KEY = 'LOW_POWER_MODE';
 const { BACKGROUND_THROTTLING_SETTING_KEY, createBackgroundThrottling } = require('./backgroundThrottling.cjs');
 const {
   GPU_PREFERENCE_SETTING_KEY,
@@ -2602,6 +2603,7 @@ function getPublicSettings() {
     [VOICE_INPUT_PAUSE_ENABLED_SETTING_KEY]: readStoredBoolean(VOICE_INPUT_PAUSE_ENABLED_SETTING_KEY, false),
     [PREVENT_DISPLAY_SLEEP_DURING_PLAYBACK_SETTING_KEY]: readStoredBoolean(PREVENT_DISPLAY_SLEEP_DURING_PLAYBACK_SETTING_KEY, false),
     [MOD_SYSTEM_ENABLED_SETTING_KEY]: readStoredBoolean(MOD_SYSTEM_ENABLED_SETTING_KEY, false),
+    [LOW_POWER_MODE_SETTING_KEY]: readStoredBoolean(LOW_POWER_MODE_SETTING_KEY, false),
     [BACKGROUND_THROTTLING_SETTING_KEY]: readStoredBoolean(BACKGROUND_THROTTLING_SETTING_KEY, false),
     [UPDATE_CHANNEL_SETTING_KEY]: getCurrentReleaseChannel().id,
     'enable_player_page_native_blur': store.get('enable_player_page_native_blur') === true,
@@ -6291,6 +6293,9 @@ ipcMain.handle('save-settings', (event, key, value) => {
     return getPublicSettings();
   }
 
+  if (key === LOW_POWER_MODE_SETTING_KEY && typeof value !== 'boolean') {
+    return getPublicSettings();
+  }
   let nextValue = value;
   if (key === UPDATE_CHANNEL_SETTING_KEY) {
     const channel = normalizeUpdateChannelSelection(value);

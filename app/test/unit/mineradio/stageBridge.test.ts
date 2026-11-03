@@ -3,6 +3,14 @@ import { createStageChannel, makeStageFrame } from '../../../src/integrations/mi
 
 // The graphics realm may control the shared player, but never own another player.
 describe('MineRadio stage bridge', () => {
+    it('sends Low Power independently of lyric timing and reduced motion', () => {
+        const input = { currentTime: 5, lyricTime: 5.2, paused: false, showLyrics: true, reducedMotion: false };
+        const standard = makeStageFrame(input);
+        const low = makeStageFrame({ ...input, lowPowerMode: true });
+        expect(low.lowPowerMode).toBe(true);
+        expect(standard.lowPowerMode).toBe(false);
+        expect({ ...low, lowPowerMode: false }).toEqual(standard);
+    });
     it('reports console opening only from the active renderer session', () => {
         const target = { postMessage() {} };
         let opened = 0;

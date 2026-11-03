@@ -30,7 +30,7 @@ try {
     await page.goto(`http://127.0.0.1:${port}/mineradio/stage.html?session=smoke`);
     assert.equal(await page.locator('#fx-lyrictranslationscale').count(), 1, 'The original translation-size control must be initialized');
     assert.equal(await page.locator('#fx-lyrictranslationopacity').count(), 1, 'The original translation-opacity control must be initialized');
-    await page.evaluate(() => {
+    const seed = () => page.evaluate(() => {
         const canvas = document.createElement('canvas'); canvas.width = canvas.height = 64;
         const context = canvas.getContext('2d'); context.fillStyle = '#75451e'; context.fillRect(0, 0, 64, 64);
         const cover = canvas.toDataURL();
@@ -44,6 +44,52 @@ try {
             queue: [{ id: 'test-track', title: 'Renderer test fixture', cover }],
         });
     });
+    await seed();
+    if (process.argv.includes('--low-power')) {
+        await page.waitForFunction(() => !!stageLyrics.current);
+        const power = await page.evaluate(async () => {
+            const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            stageApplyFrame({ ...stageSnapshot, paused: true, settings: { preset: 0, bloom: true }, lowPowerMode: false });
+            await nextFrame();
+            const text = stageLyrics.current;
+            const dpr = renderer.getPixelRatio(), saved = JSON.stringify(fx);
+            const standardPoints = renderer.info.render.points;
+            const beforeTime = uniforms.uTime.value;
+            const geometry = particles.geometry;
+            stageApplyFrame({ ...stageSnapshot, lowPowerMode: true }, { lowPowerMode: true });
+            await nextFrame();
+            const lowPoints = renderer.info.render.points;
+            const lowIndex = particles.geometry.index;
+            const positions = geometry.attributes.position;
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            for (const index of lowIndex?.array ?? []) {
+                minX = Math.min(minX, positions.getX(index)); maxX = Math.max(maxX, positions.getX(index));
+                minY = Math.min(minY, positions.getY(index)); maxY = Math.max(maxY, positions.getY(index));
+            }
+            let stable = true;
+            for (let i = 0; i < 20; i++) {
+                stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }, { lowPowerMode: false });
+                await nextFrame();
+                stable &&= renderer.info.render.points === standardPoints && stageLyrics.current === text;
+                stageApplyFrame({ ...stageSnapshot, lowPowerMode: true }, { lowPowerMode: true });
+                await nextFrame();
+                stable &&= particles.geometry.index === lowIndex && stageLyrics.current === text;
+            }
+            const result = { standardPoints, lowPoints, stable, spanX: maxX - minX, spanY: maxY - minY,
+                textStable: text === stageLyrics.current, dprStable: dpr === renderer.getPixelRatio(),
+                savedStable: saved === JSON.stringify(fx), moves: uniforms.uTime.value > beforeTime,
+                geometryStable: geometry === particles.geometry };
+            stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }, { lowPowerMode: false });
+            return result;
+        });
+        assert.deepEqual(errors, [], 'Low Power has no renderer errors');
+        assert.ok(power.lowPoints < power.standardPoints * .6, 'Low Power submits substantially fewer decorative points');
+        assert.ok(power.spanX > 4.5 && power.spanY > 4.5, 'Reduced points still cover the whole scene');
+        for (const key of ['stable', 'textStable', 'dprStable', 'savedStable', 'moves', 'geometryStable']) assert.equal(power[key], true, key);
+        console.log('Low Power scene parity:', JSON.stringify(power));
+        await page.reload();
+        await seed();
+    }
     const musicResponse = await page.evaluate(async () => {
         setPreset(12, { noSave: true, silent: true, skipTransition: true });
         stageApplyFrame({ ...stageSnapshot, metadata: { ...stageSnapshot.metadata, trackKey: 'local:fixture:revision-a' }, paused: false, reducedMotion: false, audio: { available: true, bass: .5, mid: .3, treble: .2, energy: .4, beat: .7, regions: [1, ...Array(15).fill(0)], spectrum: [80, 40, 10] } });
