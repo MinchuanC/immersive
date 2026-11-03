@@ -157,6 +157,11 @@ function stageApplyFrame(snapshot, changes) {
   var discontinuity = previous && (Math.abs((snapshot.currentTime || 0) - stageClockAt - (previous.paused ? 0 : (receivedAt - stageReceivedAt) / 1000)) > .35 ||
     previousMetadata.trackKey !== nextMetadata.trackKey || previousMetadata.title !== nextMetadata.title || previousMetadata.artist !== nextMetadata.artist || previousMetadata.album !== nextMetadata.album || !!(previous.audio && previous.audio.available) !== !!(snapshot.audio && snapshot.audio.available));
   stageSnapshot = snapshot;
+  if (snapshot.renderingSuspended || (previous && previous.renderingSuspended)) {
+    MineradioStageMotion.holdRealm(window, !!snapshot.renderingSuspended);
+    var heldWorkshop = document.querySelector('#sonic-workshop-layer iframe');
+    if (heldWorkshop) MineradioStageMotion.holdRealm(heldWorkshop.contentWindow, !!snapshot.renderingSuspended || !!snapshot.reducedMotion);
+  }
   stageReceivedAt = receivedAt;
   stageClockAt = snapshot.currentTime || 0;
   audio.currentTime = stageClockAt; audio.duration = snapshot.duration || 0; audio.paused = !!snapshot.paused; audio.src = snapshot.metadata && snapshot.metadata.title ? 'shared-player' : ''; audio.ended = false;
@@ -357,7 +362,7 @@ window.addEventListener('keydown', function (event) {
 function stageDraw(now) {
   if (stageDisposed) return;
   stageAnimation = requestAnimationFrame(stageDraw);
-  if (document.hidden || !stageSnapshot) return;
+  if (document.hidden || !stageSnapshot || stageSnapshot.renderingSuspended) return;
   var reduced = stageSnapshot.reducedMotion;
   var dt = Math.min(.05, Math.max(.001, (now - (stageLastAt || now - 16)) / 1000)); stageLastAt = now;
   audio.currentTime = Math.min(audio.duration || Infinity, stageClockAt + (playing ? Math.min(.5, (now - stageReceivedAt) / 1000) : 0));
@@ -475,6 +480,7 @@ function stageDispose() {
   });
   resources.forEach(function (resource) { resource.dispose(); });
   scene.clear(); renderer.dispose(); renderer.forceContextLoss();
+  if (window.__immersiveMotionHold) window.__immersiveMotionHold.held.clear();
   window.removeEventListener('message', stageReceive);
   window.removeEventListener('resize', stageResize);
 }

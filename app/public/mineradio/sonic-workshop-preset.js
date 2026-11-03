@@ -562,6 +562,7 @@
     iframe.style.pointerEvents = 'none';
     iframe.setAttribute('inert', '');
     iframe.onload = function () {
+      if (global.stageSnapshot && global.stageSnapshot.renderingSuspended) global.MineradioStageMotion.holdRealm(iframe.contentWindow, true);
       state.ready = true;
       pushProperties(true);
       pushMedia(true);

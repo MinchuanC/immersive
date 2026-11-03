@@ -12,6 +12,7 @@ import {
 import { extractRepresentativeColors } from '../../../../utils/colorExtractor';
 import { updatePaperShaderUniforms } from '../../../../utils/paperShaderUniforms';
 import { createPaperShaderReleaseRef, PAPER_SHADER_CONTEXT_ATTRIBUTES } from '../../../../utils/paperShaderContext';
+import { useLowPowerRenderHold } from '../../../app/backgroundThrottling/useLowPowerRenderHold';
 import { useDesktopSettingsStore } from '../../../../stores/useDesktopSettingsStore';
 import { useFirstFrameDrawn } from '../../styleTransition/firstFrame';
 import { useBlendedColors } from '../useBlendedColors';
@@ -140,6 +141,8 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
     blendProgress,
 }) => {
     const lowPowerMode = useDesktopSettingsStore(state => state.lowPowerMode);
+    const renderHeld = useLowPowerRenderHold();
+    const motionStopped = staticMode || renderHeld;
     const maxShaderPixels = lowPowerMode ? 640 * 360 : MAX_SHADER_PIXELS;
     const ditheringRef = useRef<PaperShaderElement | null>(null);
     const meshRef = useRef<PaperShaderElement | null>(null);
@@ -204,7 +207,7 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
         const ditheringMount = ditheringRef.current?.paperShaderMount;
         const meshMount = meshRef.current?.paperShaderMount;
 
-        if (staticMode) {
+        if (motionStopped) {
             ditheringMount?.setSpeed(0);
             meshMount?.setSpeed(0);
             return;
@@ -337,7 +340,7 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
 
         animationFrame = requestAnimationFrame(updateAudioResponse);
         return () => cancelAnimationFrame(animationFrame);
-    }, [audioBands, audioPower, showMesh, staticMode, tuning]);
+    }, [audioBands, audioPower, showMesh, motionStopped, tuning]);
 
     // The shaders' `speed` prop is only where they start, and 0 where static: the frame loop sets the
     // speed from there and eases a pause in. A prop that followed `paused` would set it at once.
@@ -361,7 +364,7 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
                         swirl={tuning.meshSwirl}
                         grainMixer={0}
                         grainOverlay={0.01}
-                        speed={staticMode ? 0 : tuning.meshSpeed}
+                        speed={motionStopped ? 0 : tuning.meshSpeed}
                         minPixelRatio={1}
                         maxPixelCount={maxShaderPixels}
                         webGlContextAttributes={PAPER_SHADER_CONTEXT_ATTRIBUTES}
@@ -389,7 +392,7 @@ const LatentBackground: React.FC<LatentBackgroundProps> = ({
                         shape="warp"
                         type="4x4"
                         size={tuning.ditheringSize}
-                        speed={staticMode ? 0 : tuning.ditheringSpeed}
+                        speed={motionStopped ? 0 : tuning.ditheringSpeed}
                         minPixelRatio={1}
                         maxPixelCount={maxShaderPixels}
                         webGlContextAttributes={PAPER_SHADER_CONTEXT_ATTRIBUTES}

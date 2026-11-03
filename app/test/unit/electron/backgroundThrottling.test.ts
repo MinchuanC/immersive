@@ -10,6 +10,7 @@ type State = { active: boolean; hidden: boolean };
 const { createBackgroundThrottling } = require('../../../electron/backgroundThrottling.cjs') as {
     createBackgroundThrottling: (deps: {
         isEnabled: () => boolean;
+        isLowPowerEnabled?: () => boolean;
         getStandDownReason: () => string | null;
     }) => { attach: (win: unknown) => void; refresh: () => void; getState: () => State };
 };
@@ -149,5 +150,55 @@ describe('backgroundThrottling', () => {
         throttling.refresh();
         expect(second.webContents.setBackgroundThrottling).not.toHaveBeenCalled();
         expect(first.webContents.setBackgroundThrottling).toHaveBeenCalledTimes(1);
+    });
+});
+
+
+describe('Low Power hidden rendering', () => {
+    it.each(['wallpaper mode', 'video export', 'OBS browser source'])('keeps %s live, restoring the policy afterward', standDown => {
+        let lowPower = true, reason: string | null = null;
+        const throttling = createBackgroundThrottling({ isEnabled: () => false, isLowPowerEnabled: () => lowPower, getStandDownReason: () => reason });
+        const win = createWindow();
+        throttling.attach(win);
+        win.emit('blur');
+        expect(throttling.getState()).toEqual({ active: true, hidden: false });
+        win.minimised = true;
+        win.emit('minimize');
+        expect(throttling.getState()).toEqual({ active: true, hidden: true });
+        reason = standDown;
+        throttling.refresh();
+        expect(throttling.getState()).toEqual({ active: false, hidden: false });
+        reason = null;
+        throttling.refresh();
+        expect(throttling.getState()).toEqual({ active: true, hidden: true });
+        lowPower = false;
+        throttling.refresh();
+        expect(throttling.getState()).toEqual({ active: false, hidden: false });
+    });
+
+    it('preserves the independent throttling preference through twenty hidden mode round trips', () => {
+        let lowPower = false, enabled = false;
+        const throttling = createBackgroundThrottling({ isEnabled: () => enabled, isLowPowerEnabled: () => lowPower, getStandDownReason: () => null });
+        const win = createWindow();
+        win.visible = false;
+        throttling.attach(win);
+        for (let i = 0; i < 20; i++) {
+            lowPower = true;
+            throttling.refresh();
+            expect(throttling.getState()).toEqual({ active: true, hidden: true });
+            lowPower = false;
+            throttling.refresh();
+            expect(throttling.getState()).toEqual({ active: false, hidden: false });
+        }
+        expect(win.webContents.send).toHaveBeenCalledTimes(40);
+        enabled = true;
+        lowPower = true;
+        throttling.refresh();
+        lowPower = false;
+        throttling.refresh();
+        expect(throttling.getState()).toEqual({ active: true, hidden: true });
+        win.visible = true;
+        win.emit('show');
+        expect(throttling.getState()).toEqual({ active: true, hidden: false });
     });
 });

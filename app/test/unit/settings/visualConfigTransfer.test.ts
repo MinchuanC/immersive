@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest';
 import { applyImportedConfig, buildCurrentConfig, type ConfigThemeControls } from '@/components/modal/settings/pages/storage/visualConfigTransfer';
+import { useDesktopSettingsStore } from '@/stores/useDesktopSettingsStore';
 import { useStageSettingsStore } from '@/stores/useStageSettingsStore';
 import { useThemeSettingsStore } from '@/stores/useThemeSettingsStore';
 import { useVisualizerSettingsStore } from '@/stores/useVisualizerSettingsStore';
@@ -31,6 +32,20 @@ const controls = (over: Partial<ConfigThemeControls> = {}): ConfigThemeControls 
 });
 
 describe('applyImportedConfig', () => {
+    it('keeps Low Power outside appearance exports and imports', () => {
+        const before = useDesktopSettingsStore.getState().lowPowerMode;
+        try {
+            useDesktopSettingsStore.getState().handleToggleLowPowerMode(true);
+            const exported = buildCurrentConfig(controls(), 'none');
+            expect(exported).not.toHaveProperty('lowPowerMode');
+            expect(exported).not.toHaveProperty('LOW_POWER_MODE');
+            applyImportedConfig({ visualizerOpacity: 0.6, lowPowerMode: false, LOW_POWER_MODE: false },
+                ['visualizerOpacity', 'lowPowerMode', 'LOW_POWER_MODE'], controls());
+            expect(useVisualizerSettingsStore.getState().visualizerOpacity).toBe(0.6);
+            expect(useDesktopSettingsStore.getState().lowPowerMode).toBe(true);
+        } finally { useDesktopSettingsStore.getState().handleToggleLowPowerMode(before); }
+    });
+
     it('applies the picked fields and leaves the others as they are', () => {
         const before = useVisualizerSettingsStore.getState().backgroundOpacity;
 

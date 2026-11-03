@@ -6,6 +6,7 @@ import { getMonetBackgroundCacheKey, wantMonetBackgroundUrl, checkCanvasFilterSu
 import { buildMonetDriftTrack } from './monetBackgroundDrift';
 import { useReducedMotionFor } from '../../../../hooks/useReducedMotionFor';
 import { ARRIVING_MARK } from '../../preview/frozenPicture';
+import { useLowPowerRenderHold } from '../../../app/backgroundThrottling/useLowPowerRenderHold';
 import { useFirstFrameDrawn } from '../../styleTransition/firstFrame';
 
 // src/components/visualizer/backgrounds/monet/MonetBackgroundLayer.tsx
@@ -156,8 +157,9 @@ const MonetBackgroundLayer: React.FC<MonetBackgroundLayerProps> = ({
     }, [backgroundCacheKey, sourceUrl, transparentBackground, pictureDrawn]);
 
     const driftRef = useRef<HTMLDivElement | null>(null);
+    const renderHeld = useLowPowerRenderHold();
     const driftStrength = clamp(tuning.backgroundDriftStrength ?? 0, 0, 1);
-    const driftEnabled = Boolean(tuning.backgroundDriftEnabled) && !staticMode && driftStrength > 0;
+    const driftEnabled = Boolean(tuning.backgroundDriftEnabled) && !staticMode && !renderHeld && driftStrength > 0;
     const reduceBackgroundMotion = useReducedMotionFor('monetBackground');
     useMonetBackgroundDrift(driftRef, driftEnabled, driftStrength, reduceBackgroundMotion);
     // Only promote the layer while it actually moves; an idle drift wrapper stays a plain div.

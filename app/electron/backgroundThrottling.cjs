@@ -17,7 +17,7 @@ const SAME_STATE = (a, b) => a.active === b.active && a.hidden === b.hidden;
  * names what currently needs the window live, or null. Call `refresh` whenever either may have
  * changed; the window's own minimise / restore / hide / show are followed here.
  */
-function createBackgroundThrottling({ isEnabled, getStandDownReason }) {
+function createBackgroundThrottling({ isEnabled, isLowPowerEnabled = () => false, getStandDownReason }) {
   let window = null;
   let applied = false;
   let lastReason = null;
@@ -35,7 +35,7 @@ function createBackgroundThrottling({ isEnabled, getStandDownReason }) {
     if (!window || window.isDestroyed()) {
       return;
     }
-    const enabled = isEnabled();
+    const enabled = isEnabled() || isLowPowerEnabled();
     const reason = enabled ? getStandDownReason() : null;
     const active = enabled && !reason;
     if (active !== applied || reason !== lastReason) {

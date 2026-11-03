@@ -2413,6 +2413,7 @@ let videoExportWindowRestoreState = null;
 // The 后台节流 switch; refresh() wherever one of its stand-down reasons can change.
 const backgroundThrottling = createBackgroundThrottling({
   isEnabled: () => readStoredBoolean(BACKGROUND_THROTTLING_SETTING_KEY, false),
+  isLowPowerEnabled: () => readStoredBoolean(LOW_POWER_MODE_SETTING_KEY, false),
   getStandDownReason: () => {
     if (isWallpaperModeEnabled()) return 'wallpaper mode';
     if (videoExportWindowRestoreState) return 'video export';
@@ -6335,7 +6336,7 @@ ipcMain.handle('save-settings', (event, key, value) => {
   }
   store.set(key, nextValue);
 
-  if (key === BACKGROUND_THROTTLING_SETTING_KEY || key === WALLPAPER_MODE_SETTING_KEY) {
+  if (key === BACKGROUND_THROTTLING_SETTING_KEY || key === LOW_POWER_MODE_SETTING_KEY || key === WALLPAPER_MODE_SETTING_KEY) {
     backgroundThrottling.refresh();
   }
 

@@ -23,7 +23,7 @@ const DEV_ORIGIN = 'http://localhost:3000';
 const LOG_LIMIT = 2000;
 
 const USAGE = `usage:
-  node skills/run-desktop/driver.mjs serve [--keep-profile] [--lang en|zh-CN|in]
+  node skills/run-desktop/driver.mjs serve [--production] [--keep-profile] [--lang en|zh-CN|in]
   node skills/run-desktop/driver.mjs <command> [args...]
 
 commands:
@@ -148,7 +148,8 @@ async function runServer(flags) {
   if (!flags.keepProfile) fs.rmSync(USER_DATA, { recursive: true, force: true });
   fs.mkdirSync(USER_DATA, { recursive: true });
 
-  const vite = flags.packagedApp ? null : await startVite();
+  const production = Boolean(flags.packagedApp || flags.production);
+  const vite = production ? null : await startVite();
   const mainLog = path.join(WORK_DIR, 'main.log');
   fs.writeFileSync(mainLog, '');
   const mainLines = [];
@@ -156,10 +157,10 @@ async function runServer(flags) {
 
   const app = await _electron.launch({
     executablePath: flags.packagedApp ? path.join(path.resolve(flags.packagedApp), 'Contents/MacOS/Immersive') : electronPath,
-    // Packaged playback fixtures have no accounts; use Chromium's test keychain, as Playwright's loader does.
-    args: [`--user-data-dir=${USER_DATA}`, ...(flags.packagedApp ? ['--use-mock-keychain'] : [REPO])],
+    // Isolated playback fixtures have no accounts; use Chromium's test keychain, as Playwright's loader does.
+    args: [`--user-data-dir=${USER_DATA}`, '--use-mock-keychain', ...(flags.packagedApp ? [] : [REPO])],
     cwd: REPO,
-    env: { ...process.env, ELECTRON_DEV: flags.packagedApp ? 'false' : 'true' },
+    env: { ...process.env, ELECTRON_DEV: production ? 'false' : 'true' },
     timeout: 90_000,
   });
   app.process().stdout.on('data', lineCollector(mainLines, mainLog));
@@ -196,10 +197,10 @@ async function runServer(flags) {
   let page = null;
   if (flags.packagedApp) console.log('packaged startup:', JSON.stringify(await app.evaluate(({ app, BrowserWindow }) => ({ ready: app.isReady(), windows: BrowserWindow.getAllWindows().map(window => ({ url: window.webContents.getURL(), visible: window.isVisible() })) }))));
   for (let i = 0; i < 120 && !page; i += 1) {
-    page = app.windows().find((w) => flags.packagedApp ? w.url().startsWith('file:') : w.url().startsWith(DEV_ORIGIN)) ?? null;
+    page = app.windows().find((w) => production ? w.url().startsWith('file:') : w.url().startsWith(DEV_ORIGIN)) ?? null;
     if (!page) await sleep(500);
   }
-  if (!page) throw new Error(`main window never loaded ${flags.packagedApp ? 'the packaged file' : DEV_ORIGIN}; windows: ${app.windows().map(window => window.url()).join(', ') || '(none)'}`);
+  if (!page) throw new Error(`main window never loaded ${production ? 'the production file' : DEV_ORIGIN}; windows: ${app.windows().map(window => window.url()).join(', ') || '(none)'}`);
   watchConsole(page);
   app.on('window', watchConsole);
 
@@ -340,7 +341,7 @@ if (!cmd || cmd === 'help' || cmd === '--help') {
 } else if (cmd === 'serve') {
   const langIndex = rest.indexOf('--lang');
   const packagedIndex = rest.indexOf('--packaged');
-  runServer({ keepProfile: rest.includes('--keep-profile'), lang: langIndex >= 0 ? rest[langIndex + 1] : null, packagedApp: packagedIndex >= 0 ? rest[packagedIndex + 1] : null })
+  runServer({ production: rest.includes('--production'), keepProfile: rest.includes('--keep-profile'), lang: langIndex >= 0 ? rest[langIndex + 1] : null, packagedApp: packagedIndex >= 0 ? rest[packagedIndex + 1] : null })
     .catch((error) => {
       console.error('ERROR:', error instanceof Error ? error.message : error);
       process.exit(1);

@@ -75,17 +75,32 @@ try {
                 await nextFrame();
                 stable &&= particles.geometry.index === lowIndex && stageLyrics.current === text;
             }
-            const result = { standardPoints, lowPoints, stable, spanX: maxX - minX, spanY: maxY - minY,
+            stageApplyFrame({ ...stageSnapshot, renderingSuspended: true }, { renderingSuspended: true });
+            const heldFrame = renderer.info.render.frame;
+            await new Promise(resolve => setTimeout(resolve, 180));
+            const heldDraws = renderer.info.render.frame - heldFrame;
+            stageApplyFrame({ ...stageSnapshot, renderingSuspended: false, currentTime: 22, lyricTime: 22 });
+            await nextFrame();
+            const resumed = renderer.info.render.frame > heldFrame && Math.abs(audio.currentTime - 22) < .1;
+            const result = { heldDraws, resumed, standardPoints, lowPoints, stable, spanX: maxX - minX, spanY: maxY - minY,
                 textStable: text === stageLyrics.current, dprStable: dpr === renderer.getPixelRatio(),
                 savedStable: saved === JSON.stringify(fx), moves: uniforms.uTime.value > beforeTime,
                 geometryStable: geometry === particles.geometry };
+            stageApplyFrame({ ...stageSnapshot, settings: { preset: 1, coverResolution: .8, bloom: false } });
+            await nextFrame();
+            const changedGeometry = particles.geometry;
             stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }, { lowPowerMode: false });
+            await nextFrame();
+            result.latestPreferencesPreserved = fx.preset === 1 && fx.coverResolution === .8 && fx.bloom === false
+                && particles.geometry === changedGeometry && particles.geometry.index === null;
             return result;
         });
         assert.deepEqual(errors, [], 'Low Power has no renderer errors');
+        assert.equal(power.heldDraws, 0, 'Native hidden hold stops actual GPU draws even if document visibility stays visible');
+        assert.equal(power.resumed, true, 'Restore draws the current clock without catch-up');
         assert.ok(power.lowPoints < power.standardPoints * .6, 'Low Power submits substantially fewer decorative points');
         assert.ok(power.spanX > 4.5 && power.spanY > 4.5, 'Reduced points still cover the whole scene');
-        for (const key of ['stable', 'textStable', 'dprStable', 'savedStable', 'moves', 'geometryStable']) assert.equal(power[key], true, key);
+        for (const key of ['stable', 'textStable', 'dprStable', 'savedStable', 'moves', 'geometryStable', 'latestPreferencesPreserved']) assert.equal(power[key], true, key);
         console.log('Low Power scene parity:', JSON.stringify(power));
         await page.reload();
         await seed();
@@ -137,11 +152,26 @@ try {
     assert.ok(musicResponse.afterSeek > musicResponse.ambientBefore.time, 'A media seek cannot rewind the visual clock');
     assert.ok(musicResponse.pausedActivity < .02, 'Pause settles ambience within about 700 ms');
     assert.ok(musicResponse.regions.every(value => value === 0), 'Unavailable analysis clears regional accents');
+    if (process.argv.includes('--low-power')) await page.evaluate(() => stageApplyFrame({ ...stageSnapshot, lowPowerMode: true }));
     for (let preset = 0; preset < 13; preset++) {
         await page.evaluate(value => setPreset(value, { noSave: true, silent: true }), preset);
         await page.waitForTimeout(preset === 6 || preset === 8 ? 600 : 100);
         assert.equal(await page.evaluate(() => fx.preset), preset);
+        if (process.argv.includes('--low-power')) {
+            const held = await page.evaluate(async () => {
+                stageApplyFrame({ ...stageSnapshot, renderingSuspended: true });
+                const before = renderer.info.render.frame;
+                await new Promise(resolve => setTimeout(resolve, 80));
+                const stopped = before === renderer.info.render.frame;
+                const workshop = document.querySelector('#sonic-workshop-layer iframe');
+                const childHeld = !workshop || workshop.contentWindow.__immersiveMotionHold?.paused;
+                stageApplyFrame({ ...stageSnapshot, renderingSuspended: false });
+                return { stopped, childHeld };
+            });
+            assert.deepEqual(held, { stopped: true, childHeld: true }, 'Hidden preset ' + preset);
+        }
     }
+    if (process.argv.includes('--low-power')) await page.evaluate(() => stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }));
     const restoredCamera = await page.evaluate(async () => {
         const commands = [];
         const receive = event => {
@@ -234,11 +264,14 @@ try {
         const receive = event => {
             if (event.data?.type === 'command' && event.data.action === 'settings' && event.data.value.cameraStateJson) cameras.push(JSON.parse(event.data.value.cameraStateJson));
         };
+        createUserFxArchive(); saveUserFxArchive(0); setPreset(9, { noSave: true });
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         window.addEventListener('message', receive);
         try {
-            createUserFxArchive(); saveUserFxArchive(0); setPreset(9, { noSave: true }); applyUserFxArchive(0);
+            applyUserFxArchive(0);
+            const restoredPose = captureCameraArchiveState();
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-            return { preset: fx.preset, presets: presetMeta.length, shelfCards: shelfManager.getCards().length, lineProgress: getLyricLineProgress(lyricsLines[0], null, 5), audio: Array.from(frequencyData), cameras, camera: captureCameraArchiveState() };
+            return { preset: fx.preset, presets: presetMeta.length, shelfCards: shelfManager.getCards().length, lineProgress: getLyricLineProgress(lyricsLines[0], null, 5), audio: Array.from(frequencyData), cameras, camera: restoredPose };
         } finally { window.removeEventListener('message', receive); }
     });
     assert.equal(controls.preset, 12);
@@ -247,7 +280,7 @@ try {
     assert.equal(controls.lineProgress, 0);
     assert.deepEqual(controls.audio, []);
     assert.ok(controls.cameras.length > 0, 'Applying a user archive persists its camera');
-    assert.ok(controls.cameras.every(camera => camera.cameraOrbitTheta === controls.camera.cameraOrbitTheta && camera.cameraOrbitPhi === controls.camera.cameraOrbitPhi && camera.cameraOrbitRadius === controls.camera.cameraOrbitRadius), 'Archive settings publish the restored pose, never the previous pose');
+    assert.ok(controls.cameras.every(camera => camera.cameraOrbitTheta === controls.camera.cameraOrbitTheta && camera.cameraOrbitPhi === controls.camera.cameraOrbitPhi && camera.cameraOrbitRadius === controls.camera.cameraOrbitRadius), 'Archive settings publish the restored pose, never the previous pose: ' + JSON.stringify({ cameras: controls.cameras, expected: controls.camera }));
     const startOnly = await page.evaluate(() => {
         const line = stageTranslateLyrics([{ fullText: 'One two', startTime: 1, endTime: 4, words: [{ text: 'One', startTime: 1, endTime: 1 }, { text: 'two', startTime: 2, endTime: 2 }] }], true)[0];
         lyricsHasNativeKaraoke = true;
