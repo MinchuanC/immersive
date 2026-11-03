@@ -33,6 +33,7 @@ const PERFORMANCE: SettingsGroupDef = { id: 'graphicsPerformance', titleKey: 'op
 const MOTION: SettingsGroupDef = { id: 'graphicsMotion', titleKey: 'options.reduceMotionSection' };
 
 const O = {
+    lowPowerMode: option(PERFORMANCE, 'lowPowerMode', 'options.lowPowerMode'),
     staticMode: option(PERFORMANCE, 'enableStaticMode', 'options.enableStaticMode'),
     homeBackground: option(PERFORMANCE, 'disableHomeDynamicBackground', 'options.disableHomeDynamicBackground'),
     nativeBlur: option(PERFORMANCE, 'enablePlayerPageNativeBlur', 'options.enablePlayerPageNativeBlur'),
@@ -73,6 +74,8 @@ const GraphicsPage: React.FC = () => {
     })));
     const nativeBlur = usePlayerChromeSettingsStore(state => state.enablePlayerPageNativeBlur);
     const setNativeBlur = usePlayerChromeSettingsStore(state => state.handleTogglePlayerPageNativeBlur);
+    const lowPowerMode = useDesktopSettingsStore(state => state.lowPowerMode);
+    const setLowPowerMode = useDesktopSettingsStore(state => state.handleToggleLowPowerMode);
     const backgroundThrottling = useDesktopSettingsStore(state => state.backgroundThrottling);
     const setBackgroundThrottling = useDesktopSettingsStore(state => state.handleToggleBackgroundThrottling);
     const visualizer = useVisualizerSettingsStore(useShallow(state => ({
@@ -95,6 +98,9 @@ const GraphicsPage: React.FC = () => {
     return (
         <>
             <Group def={PERFORMANCE}>
+                <Row option={O.lowPowerMode}>
+                    <Toggle checked={lowPowerMode} onChange={setLowPowerMode} />
+                </Row>
                 <Row option={O.staticMode} hint={t('options.enableStaticModeDesc')}>
                     <Toggle checked={theme.staticMode} onChange={theme.setStaticMode} />
                 </Row>

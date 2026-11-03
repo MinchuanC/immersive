@@ -3,6 +3,8 @@ import { MineradioStage } from '../../../../integrations/mineradio/MineradioStag
 import { useMineradioHost } from '../../../../integrations/mineradio/MineradioHost';
 import type { StageCommand } from '../../../../integrations/mineradio/stageBridge';
 import { selectDisplaySong, usePlaybackStore } from '../../../../stores/usePlaybackStore';
+import { useLowPowerRenderHold } from '../../../app/backgroundThrottling/useLowPowerRenderHold';
+import { useDesktopSettingsStore } from '../../../../stores/useDesktopSettingsStore';
 import { useVisualizerSettingsStore } from '../../../../stores/useVisualizerSettingsStore';
 import * as signals from '../../../../stores/motionSignals';
 import type { VisualizerBackgroundRenderProps } from '../definition';
@@ -19,6 +21,8 @@ import { sampleImmersionDirection } from '../../../../services/immersion/directo
 // The donor draws Folia's current song and analyser; it never creates a media player.
 export default function MineradioBackground({ config, coverUrl, paused, staticMode, audioBands, audioPower, lyricView }: VisualizerBackgroundRenderProps & { lyricView?: VisualizerSharedProps }) {
     const host = useMineradioHost();
+    const renderingSuspended = useLowPowerRenderHold();
+    const lowPowerMode = useDesktopSettingsStore(state => state.lowPowerMode);
     const drawn = useFirstFrameDrawn();
     const song = usePlaybackStore(selectDisplaySong);
     const lyrics = usePlaybackStore(state => state.lyrics);
@@ -42,6 +46,8 @@ export default function MineradioBackground({ config, coverUrl, paused, staticMo
         duration={lyricView?.duration ?? duration}
         paused={paused}
         reducedMotion={staticMode}
+        lowPowerMode={lowPowerMode}
+        renderingSuspended={renderingSuspended}
         lyricRendererLabel={i18n.t('options.mineradioLyricRenderer')}
         lyricRenderer={lyricView ? 'mineradio' : 'folia'}
         metadata={metadata}

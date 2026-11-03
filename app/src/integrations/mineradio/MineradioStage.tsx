@@ -42,16 +42,18 @@ export function MineradioStage(props: MineradioStageProps) {
         openConsole();
         let raf = 0;
         let lastSent = -Infinity;
+        let wasSuspended = false;
         let staticValues: unknown[] = [];
         const update = (now: number) => {
-            if (now - lastSent >= 1000 / 30) {
-                const state = latest.current;
+            const state = latest.current;
+            if (now - lastSent >= 1000 / 30 && (!state.renderingSuspended || !wasSuspended)) {
                 const frame = makeStageFrame({ ...state, currentTime: typeof state.currentTime === 'number' ? state.currentTime : state.currentTime.get(), lyricTime: typeof state.lyricTime === 'object' ? state.lyricTime.get() : state.lyricTime, audio: state.sampleAudio?.() ?? state.audio, direction: state.sampleDirection?.() ?? null, directionRevision: getImmersionDirectionRevision() });
-                const nextStaticValues = [state.duration, state.paused, state.metadata, state.lines, state.wordTiming, state.collections, state.queue, state.settings, state.showControls, state.showLyrics, state.reducedMotion, state.lyricRendererLabel, state.lyricRenderer, state.locale, state.consoleCopy];
+                const nextStaticValues = [state.duration, state.paused, state.metadata, state.lines, state.wordTiming, state.collections, state.queue, state.settings, state.showControls, state.showLyrics, state.reducedMotion, state.lowPowerMode, state.renderingSuspended, state.lyricRendererLabel, state.lyricRenderer, state.locale, state.consoleCopy];
                 const changed = nextStaticValues.some((value, index) => value !== staticValues[index]);
                 channel.send(changed ? frame : { currentTime: frame.currentTime, lyricTime: frame.lyricTime, audio: frame.audio, direction: frame.direction, directionRevision: frame.directionRevision });
                 staticValues = nextStaticValues;
                 lastSent = now;
+                wasSuspended = state.renderingSuspended === true;
             }
             raf = requestAnimationFrame(update);
         };

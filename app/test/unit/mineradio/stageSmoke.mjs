@@ -23,6 +23,16 @@ let browser;
 try {
     browser = await chromium.launch({ headless: true, executablePath: chrome });
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    if (process.argv.includes('--low-power')) await page.addInitScript(() => {
+        const request = window.requestAnimationFrame.bind(window), cancel = window.cancelAnimationFrame.bind(window);
+        const pending = window.lowPowerPendingFrames = new Set();
+        window.requestAnimationFrame = callback => {
+            const id = request(time => { pending.delete(id); callback(time); });
+            pending.add(id);
+            return id;
+        };
+        window.cancelAnimationFrame = id => { pending.delete(id); cancel(id); };
+    });
     page.setDefaultTimeout(10000);
     const errors = [];
     page.on('pageerror', error => errors.push(error.stack));
@@ -30,7 +40,7 @@ try {
     await page.goto(`http://127.0.0.1:${port}/mineradio/stage.html?session=smoke`);
     assert.equal(await page.locator('#fx-lyrictranslationscale').count(), 1, 'The original translation-size control must be initialized');
     assert.equal(await page.locator('#fx-lyrictranslationopacity').count(), 1, 'The original translation-opacity control must be initialized');
-    await page.evaluate(() => {
+    const seed = () => page.evaluate(() => {
         const canvas = document.createElement('canvas'); canvas.width = canvas.height = 64;
         const context = canvas.getContext('2d'); context.fillStyle = '#75451e'; context.fillRect(0, 0, 64, 64);
         const cover = canvas.toDataURL();
@@ -44,6 +54,98 @@ try {
             queue: [{ id: 'test-track', title: 'Renderer test fixture', cover }],
         });
     });
+    await seed();
+    if (process.argv.includes('--low-power')) {
+        await page.waitForFunction(() => !!stageLyrics.current);
+        const power = await page.evaluate(async () => {
+            const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            stageApplyFrame({ ...stageSnapshot, paused: true, settings: { preset: 0, bloom: true }, lowPowerMode: false });
+            await nextFrame();
+            const text = stageLyrics.current;
+            const dpr = renderer.getPixelRatio(), saved = JSON.stringify(fx);
+            const standardPoints = renderer.info.render.points;
+            const beforeTime = uniforms.uTime.value;
+            const geometry = particles.geometry;
+            stageApplyFrame({ ...stageSnapshot, lowPowerMode: true }, { lowPowerMode: true });
+            await nextFrame();
+            const lowPoints = renderer.info.render.points;
+            const lowIndex = particles.geometry.index;
+            const positions = geometry.attributes.position;
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            for (const index of lowIndex?.array ?? []) {
+                minX = Math.min(minX, positions.getX(index)); maxX = Math.max(maxX, positions.getX(index));
+                minY = Math.min(minY, positions.getY(index)); maxY = Math.max(maxY, positions.getY(index));
+            }
+            let stable = true;
+            for (let i = 0; i < 20; i++) {
+                stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }, { lowPowerMode: false });
+                await nextFrame();
+                stable &&= renderer.info.render.points === standardPoints && stageLyrics.current === text;
+                stageApplyFrame({ ...stageSnapshot, lowPowerMode: true }, { lowPowerMode: true });
+                await nextFrame();
+                stable &&= particles.geometry.index === lowIndex && stageLyrics.current === text;
+            }
+            stageApplyFrame({ ...stageSnapshot, renderingSuspended: true }, { renderingSuspended: true });
+            const heldFrame = renderer.info.render.frame;
+            await new Promise(resolve => setTimeout(resolve, 180));
+            const heldDraws = renderer.info.render.frame - heldFrame;
+            stageApplyFrame({ ...stageSnapshot, renderingSuspended: false, currentTime: 22, lyricTime: 22 });
+            await nextFrame();
+            const resumed = renderer.info.render.frame > heldFrame && Math.abs(audio.currentTime - 22) < .1;
+            const result = { heldDraws, resumed, standardPoints, lowPoints, stable, spanX: maxX - minX, spanY: maxY - minY,
+                textStable: text === stageLyrics.current, dprStable: dpr === renderer.getPixelRatio(),
+                savedStable: saved === JSON.stringify(fx), moves: uniforms.uTime.value > beforeTime,
+                geometryStable: geometry === particles.geometry };
+            stageApplyFrame({ ...stageSnapshot, settings: { preset: 1, coverResolution: .8, bloom: false } });
+            await nextFrame();
+            const changedGeometry = particles.geometry;
+            stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }, { lowPowerMode: false });
+            await nextFrame();
+            result.latestPreferencesPreserved = fx.preset === 1 && fx.coverResolution === .8 && fx.bloom === false
+                && particles.geometry === changedGeometry && particles.geometry.index === null;
+            return result;
+        });
+        assert.deepEqual(errors, [], 'Low Power has no renderer errors');
+        assert.equal(power.heldDraws, 0, 'Native hidden hold stops actual GPU draws even if document visibility stays visible');
+        assert.equal(power.resumed, true, 'Restore draws the current clock without catch-up');
+        assert.ok(power.lowPoints < power.standardPoints * .6, 'Low Power submits substantially fewer decorative points');
+        assert.ok(power.spanX > 4.5 && power.spanY > 4.5, 'Reduced points still cover the whole scene');
+        for (const key of ['stable', 'textStable', 'dprStable', 'savedStable', 'moves', 'geometryStable', 'latestPreferencesPreserved']) assert.equal(power[key], true, key);
+        console.log('Low Power scene parity:', JSON.stringify(power));
+        const client = await page.context().newCDPSession(page);
+        await client.send('Performance.enable');
+        const roundTrip = () => page.evaluate(async () => {
+            for (const lowPowerMode of [true, false]) {
+                stageApplyFrame({ ...stageSnapshot, lowPowerMode });
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            }
+        });
+        // Warm both index buffers before collecting the post-GC heap and live GPU/loop counts.
+        await roundTrip(); await roundTrip();
+        const sampleResources = async round => {
+            await client.send('HeapProfiler.collectGarbage');
+            const { metrics } = await client.send('Performance.getMetrics');
+            const counts = Object.fromEntries(metrics.filter(item => ['JSHeapUsedSize', 'JSEventListeners', 'Nodes'].includes(item.name)).map(item => [item.name, item.value]));
+            return { round, ...counts, ...await page.evaluate(() => ({
+                ...renderer.info.memory, frames: lowPowerPendingFrames.size,
+                held: window.__immersiveMotionHold?.held.size ?? 0,
+            })) };
+        };
+        const resources = [await sampleResources(0)];
+        for (let round = 1; round <= 20; round++) {
+            await roundTrip();
+            if (round % 5 === 0) resources.push(await sampleResources(round));
+        }
+        for (const sample of resources.slice(1)) {
+            for (const key of ['geometries', 'textures', 'frames', 'held', 'JSEventListeners']) assert.equal(sample[key], resources[0][key], 'Round-trip resource stability: ' + key);
+            assert.ok(sample.Nodes <= resources[0].Nodes + 4, 'No accumulating DOM nodes');
+            assert.ok(sample.JSHeapUsedSize <= resources[0].JSHeapUsedSize * 1.05 + 262144, 'No growing retained heap after warm-up');
+        }
+        console.log('Low Power warmed round-trip resources:', JSON.stringify(resources));
+        await client.detach();
+        await page.reload();
+        await seed();
+    }
     const musicResponse = await page.evaluate(async () => {
         setPreset(12, { noSave: true, silent: true, skipTransition: true });
         stageApplyFrame({ ...stageSnapshot, metadata: { ...stageSnapshot.metadata, trackKey: 'local:fixture:revision-a' }, paused: false, reducedMotion: false, audio: { available: true, bass: .5, mid: .3, treble: .2, energy: .4, beat: .7, regions: [1, ...Array(15).fill(0)], spectrum: [80, 40, 10] } });
@@ -91,11 +193,26 @@ try {
     assert.ok(musicResponse.afterSeek > musicResponse.ambientBefore.time, 'A media seek cannot rewind the visual clock');
     assert.ok(musicResponse.pausedActivity < .02, 'Pause settles ambience within about 700 ms');
     assert.ok(musicResponse.regions.every(value => value === 0), 'Unavailable analysis clears regional accents');
+    if (process.argv.includes('--low-power')) await page.evaluate(() => stageApplyFrame({ ...stageSnapshot, lowPowerMode: true }));
     for (let preset = 0; preset < 13; preset++) {
         await page.evaluate(value => setPreset(value, { noSave: true, silent: true }), preset);
         await page.waitForTimeout(preset === 6 || preset === 8 ? 600 : 100);
         assert.equal(await page.evaluate(() => fx.preset), preset);
+        if (process.argv.includes('--low-power')) {
+            const held = await page.evaluate(async () => {
+                stageApplyFrame({ ...stageSnapshot, renderingSuspended: true });
+                const before = renderer.info.render.frame;
+                await new Promise(resolve => setTimeout(resolve, 80));
+                const stopped = before === renderer.info.render.frame;
+                const workshop = document.querySelector('#sonic-workshop-layer iframe');
+                const childHeld = !workshop || workshop.contentWindow.__immersiveMotionHold?.paused;
+                stageApplyFrame({ ...stageSnapshot, renderingSuspended: false });
+                return { stopped, childHeld };
+            });
+            assert.deepEqual(held, { stopped: true, childHeld: true }, 'Hidden preset ' + preset);
+        }
     }
+    if (process.argv.includes('--low-power')) await page.evaluate(() => stageApplyFrame({ ...stageSnapshot, lowPowerMode: false }));
     const restoredCamera = await page.evaluate(async () => {
         const commands = [];
         const receive = event => {
@@ -188,11 +305,19 @@ try {
         const receive = event => {
             if (event.data?.type === 'command' && event.data.action === 'settings' && event.data.value.cameraStateJson) cameras.push(JSON.parse(event.data.value.cameraStateJson));
         };
+        createUserFxArchive(); saveUserFxArchive(0); setPreset(9, { noSave: true });
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await new Promise(resolve => {
+            const drained = event => { if (event.data === 'archive-setup-drained') { window.removeEventListener('message', drained); resolve(); } };
+            window.addEventListener('message', drained);
+            window.postMessage('archive-setup-drained', '*');
+        });
         window.addEventListener('message', receive);
         try {
-            createUserFxArchive(); saveUserFxArchive(0); setPreset(9, { noSave: true }); applyUserFxArchive(0);
+            applyUserFxArchive(0);
+            const restoredPose = captureCameraArchiveState();
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-            return { preset: fx.preset, presets: presetMeta.length, shelfCards: shelfManager.getCards().length, lineProgress: getLyricLineProgress(lyricsLines[0], null, 5), audio: Array.from(frequencyData), cameras, camera: captureCameraArchiveState() };
+            return { preset: fx.preset, presets: presetMeta.length, shelfCards: shelfManager.getCards().length, lineProgress: getLyricLineProgress(lyricsLines[0], null, 5), audio: Array.from(frequencyData), cameras, camera: restoredPose };
         } finally { window.removeEventListener('message', receive); }
     });
     assert.equal(controls.preset, 12);
@@ -201,7 +326,7 @@ try {
     assert.equal(controls.lineProgress, 0);
     assert.deepEqual(controls.audio, []);
     assert.ok(controls.cameras.length > 0, 'Applying a user archive persists its camera');
-    assert.ok(controls.cameras.every(camera => camera.cameraOrbitTheta === controls.camera.cameraOrbitTheta && camera.cameraOrbitPhi === controls.camera.cameraOrbitPhi && camera.cameraOrbitRadius === controls.camera.cameraOrbitRadius), 'Archive settings publish the restored pose, never the previous pose');
+    assert.ok(controls.cameras.every(camera => camera.cameraOrbitTheta === controls.camera.cameraOrbitTheta && camera.cameraOrbitPhi === controls.camera.cameraOrbitPhi && camera.cameraOrbitRadius === controls.camera.cameraOrbitRadius), 'Archive settings publish the restored pose, never the previous pose: ' + JSON.stringify({ cameras: controls.cameras, expected: controls.camera }));
     const startOnly = await page.evaluate(() => {
         const line = stageTranslateLyrics([{ fullText: 'One two', startTime: 1, endTime: 4, words: [{ text: 'One', startTime: 1, endTime: 1 }, { text: 'two', startTime: 2, endTime: 2 }] }], true)[0];
         lyricsHasNativeKaraoke = true;

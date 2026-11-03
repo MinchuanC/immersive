@@ -350,6 +350,14 @@ export const settingsCommands: CommandPaletteCommand[] = [
         },
     },
     createToggleCommand(
+        'desktop-toggle-low-power-mode',
+        'settings',
+        'Low Power mode',
+        'Reduce background graphics while preserving lyric animation',
+        ['low power', 'battery', 'energy saving', '低功耗模式', '省电模式'],
+        context => context.settings.toggleLowPowerMode(),
+    ),
+    createToggleCommand(
         'desktop-toggle-background-throttling',
         'settings',
         'Background throttling',

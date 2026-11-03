@@ -10,6 +10,25 @@ var stageStaticSkullAsset = null;
 var stageLyricRevision = 0, stageStaticLyricCue = '';
 var stageDirectionRevision = 0, stageStaticDirection = -1;
 var stageRestoringCamera = false;
+var stageRenderedLowPower = false, stagePointBudgets = new WeakMap();
+function stageBudgetPoints(object, lowPower) {
+  if (!object) return;
+  var geometry = object.geometry, budget = stagePointBudgets.get(geometry);
+  if (lowPower && !budget) {
+    var original = geometry.index, count = original ? original.count : geometry.attributes.position.count;
+    var indices = [];
+    for (var i = 0; i < count; i += 4) indices.push(original ? original.getX(i) : i);
+    budget = { original: original, low: new THREE.Uint32BufferAttribute(indices, 1) };
+    stagePointBudgets.set(geometry, budget);
+  }
+  if (!budget) return;
+  var index = lowPower ? budget.low : budget.original;
+  if (geometry.index !== index) {
+    // Release the outgoing GPU index too; the original CPU attributes and geometry stay intact.
+    geometry.dispose();
+    geometry.setIndex(index);
+  }
+}
 var stageConsoleOpen = false, stageConsoleObserver;
 function stageReportConsoleVisibility(open) {
   if (stageConsoleOpen === open) return;
@@ -138,6 +157,11 @@ function stageApplyFrame(snapshot, changes) {
   var discontinuity = previous && (Math.abs((snapshot.currentTime || 0) - stageClockAt - (previous.paused ? 0 : (receivedAt - stageReceivedAt) / 1000)) > .35 ||
     previousMetadata.trackKey !== nextMetadata.trackKey || previousMetadata.title !== nextMetadata.title || previousMetadata.artist !== nextMetadata.artist || previousMetadata.album !== nextMetadata.album || !!(previous.audio && previous.audio.available) !== !!(snapshot.audio && snapshot.audio.available));
   stageSnapshot = snapshot;
+  if (snapshot.renderingSuspended || (previous && previous.renderingSuspended)) {
+    MineradioStageMotion.holdRealm(window, !!snapshot.renderingSuspended);
+    var heldWorkshop = document.querySelector('#sonic-workshop-layer iframe');
+    if (heldWorkshop) MineradioStageMotion.holdRealm(heldWorkshop.contentWindow, !!snapshot.renderingSuspended || !!snapshot.reducedMotion);
+  }
   stageReceivedAt = receivedAt;
   stageClockAt = snapshot.currentTime || 0;
   audio.currentTime = stageClockAt; audio.duration = snapshot.duration || 0; audio.paused = !!snapshot.paused; audio.src = snapshot.metadata && snapshot.metadata.title ? 'shared-player' : ''; audio.ended = false;
@@ -338,13 +362,13 @@ window.addEventListener('keydown', function (event) {
 function stageDraw(now) {
   if (stageDisposed) return;
   stageAnimation = requestAnimationFrame(stageDraw);
-  if (document.hidden || !stageSnapshot) return;
+  if (document.hidden || !stageSnapshot || stageSnapshot.renderingSuspended) return;
   var reduced = stageSnapshot.reducedMotion;
   var dt = Math.min(.05, Math.max(.001, (now - (stageLastAt || now - 16)) / 1000)); stageLastAt = now;
   audio.currentTime = Math.min(audio.duration || Infinity, stageClockAt + (playing ? Math.min(.5, (now - stageReceivedAt) / 1000) : 0));
   var workshop = document.querySelector('#sonic-workshop-layer iframe');
   if (workshop && workshop.contentDocument && workshop.contentDocument.querySelector('canvas')) MineradioStageMotion.holdRealm(workshop.contentWindow, !!reduced);
-  var compositionChanged = !stageFirstDrawn || stageStaticSettings !== stageLastSettings || stageStaticCatalog !== playlistCatalogRevision || stageStaticCover !== coverTex.version || stageStaticViewport !== stageViewportRevision || stageStaticSkullAsset !== skullParticleAsset.data || stageStaticDirection !== stageDirectionRevision;
+  var compositionChanged = stageRenderedLowPower !== !!stageSnapshot.lowPowerMode || !stageFirstDrawn || stageStaticSettings !== stageLastSettings || stageStaticCatalog !== playlistCatalogRevision || stageStaticCover !== coverTex.version || stageStaticViewport !== stageViewportRevision || stageStaticSkullAsset !== skullParticleAsset.data || stageStaticDirection !== stageDirectionRevision;
   var staticChanged = !stageWasReduced || compositionChanged;
   var lyricCue = '';
   if (reduced) {
@@ -403,7 +427,11 @@ function stageDraw(now) {
   }
   var skull = fx.preset === 6, workshopPreset = fx.preset === 8;
   particles.visible = !skull && !workshopPreset && fx.preset !== 3;
-  bloomParticles.visible = particles.visible && fx.bloom && fx.bloomStrength > .01;
+  var lowPower = stageSnapshot.lowPowerMode === true;
+  stageBudgetPoints(particles, lowPower);
+  stageBudgetPoints(floatGroup, lowPower);
+  stageBudgetPoints(skullParticleGroup, lowPower);
+  bloomParticles.visible = !lowPower && particles.visible && fx.bloom && fx.bloomStrength > .01;
   bloomParticles.rotation.copy(particles.rotation);
   var frame = { scene: scene, fx: fx, time: uniforms.uTime.value, screenHeight: innerHeight, dpr: renderer.getPixelRatio(), visualRotation: particles.rotation, visualRotationActive: orbit.rotating, audio: { bass: bass, mid: mid, treble: treble, beat: beatPulse, energy: audioEnergy } };
   if (stageSnapshot.direction) frame.scoreTime = audio.currentTime;
@@ -417,6 +445,7 @@ function stageDraw(now) {
   if (fx.particleLyrics) { if (reduced) stageRefreshLyrics(false); updateStageLyrics3D(reduced ? 0 : dt); }
   renderer.render(scene, camera);
   stageWasReduced = !!reduced;
+  stageRenderedLowPower = lowPower;
   stageStaticLyricCue = lyricCue;
   stageStaticSettings = stageLastSettings; stageStaticCatalog = playlistCatalogRevision; stageStaticCover = coverTex.version; stageStaticViewport = stageViewportRevision; stageRenderedPreset = fx.preset; stageStaticSkullAsset = skullParticleAsset.data;
   if (!stageFirstDrawn) { stageFirstDrawn = true; parent.postMessage({ scope: 'immersive-mineradio', session: stageSession, type: 'drawn' }, '*'); }
@@ -451,6 +480,7 @@ function stageDispose() {
   });
   resources.forEach(function (resource) { resource.dispose(); });
   scene.clear(); renderer.dispose(); renderer.forceContextLoss();
+  if (window.__immersiveMotionHold) window.__immersiveMotionHold.held.clear();
   window.removeEventListener('message', stageReceive);
   window.removeEventListener('resize', stageResize);
 }

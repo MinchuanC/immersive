@@ -159,6 +159,7 @@ const createContext = (overrides: CommandPaletteContextOverrides = {}): CommandP
             toggleVoiceInputPause: vi.fn(),
             togglePreventDisplaySleepDuringPlayback: vi.fn(),
             toggleBackgroundThrottling: vi.fn(),
+            toggleLowPowerMode: vi.fn(),
             toggleWallpaperMode: vi.fn(),
             toggleCloseToTray: vi.fn(),
             toggleHideRemoteControlTitlebar: vi.fn(),
@@ -880,6 +881,14 @@ describe('command palette registry', () => {
         } finally {
             vi.unstubAllGlobals();
         }
+    });
+
+    it('matches and executes Low Power mode', async () => {
+        const context = createContext();
+        const [match] = getCommandPaletteMatches('低功耗模式', context);
+        expect(match.command.id).toBe('desktop-toggle-low-power-mode');
+        await match.command.execute('', context);
+        expect(context.settings.toggleLowPowerMode).toHaveBeenCalledOnce();
     });
 
     it('matches and executes the desktop background throttling toggle', async () => {

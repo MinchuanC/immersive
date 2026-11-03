@@ -205,6 +205,9 @@ export const buildSettingsCommandContext = (
         togglePreventDisplaySleepDuringPlayback: () => desktop.handleTogglePreventDisplaySleepDuringPlayback(
             !useDesktopSettingsStore.getState().preventDisplaySleepDuringPlayback,
         ),
+        toggleLowPowerMode: () => desktop.handleToggleLowPowerMode(
+            !useDesktopSettingsStore.getState().lowPowerMode,
+        ),
         toggleBackgroundThrottling: () => desktop.handleToggleBackgroundThrottling(
             !useDesktopSettingsStore.getState().backgroundThrottling,
         ),

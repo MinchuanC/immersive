@@ -16,6 +16,7 @@ import {
     resolveDaylightInversion,
     resolveHalftoneInversion,
 } from './nomandShaderAdjustments';
+import { useDesktopSettingsStore } from '../../../../stores/useDesktopSettingsStore';
 import { useFirstFrameDrawn } from '../../styleTransition/firstFrame';
 import { PAPER_SHADER_CONTEXT_ATTRIBUTES } from '../../../../utils/paperShaderContext';
 
@@ -70,6 +71,7 @@ const NomandBackgroundLayer: React.FC<NomandBackgroundLayerProps> = ({
     theme,
     isDaylight,
 }) => {
+    const lowPowerMode = useDesktopSettingsStore(state => state.lowPowerMode);
     const tuning = { ...DEFAULT_NOMAND_BACKGROUND_TUNING, ...tuningOverride };
     const sourceUrl = resolveNomandSourceUrl(coverUrl, monetBackgroundImage, tuning);
     const shaderRef = useRef<PaperShaderElement | null>(null);
@@ -93,7 +95,7 @@ const NomandBackgroundLayer: React.FC<NomandBackgroundLayerProps> = ({
             image: sourceUrl,
             fit: 'cover' as const,
             minPixelRatio: 1,
-            maxPixelCount: 1920 * 1080,
+            maxPixelCount: lowPowerMode ? 640 * 360 : 1920 * 1080,
             webGlContextAttributes: PAPER_SHADER_CONTEXT_ATTRIBUTES,
             style: { width: '100%', height: '100%' },
         };

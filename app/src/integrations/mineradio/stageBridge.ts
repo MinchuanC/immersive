@@ -24,6 +24,8 @@ export interface StageInput {
     showControls?: boolean;
     showLyrics?: boolean;
     reducedMotion?: boolean;
+    lowPowerMode?: boolean;
+    renderingSuspended?: boolean;
     lyricRendererLabel?: string;
     lyricRenderer?: 'folia' | 'mineradio';
     locale?: string;
@@ -59,6 +61,8 @@ export function makeStageFrame(input: StageInput) {
         showControls: input.showControls !== false,
         showLyrics: input.showLyrics === true,
         reducedMotion: input.reducedMotion === true,
+        lowPowerMode: input.lowPowerMode === true,
+        renderingSuspended: input.renderingSuspended === true,
         lyricRendererLabel: input.lyricRendererLabel,
         lyricRenderer: input.lyricRenderer ?? 'folia',
         locale: input.locale,

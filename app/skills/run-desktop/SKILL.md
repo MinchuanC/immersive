@@ -40,6 +40,8 @@ node skills/run-desktop/driver.mjs serve
 可选参数：`--lang en`（界面切英文，按文字点击更稳定）、`--keep-profile`（沿用上次的 profile，
 默认每次清空）。
 
+For production resource checks, first build with `ELECTRON_DEV=false ELECTRON=true node node_modules/vite/bin/vite.js build`, then run `serve --production`. This loads the local `dist` files with `ELECTRON_DEV=false` and no Vite server. It is an unbundled production run, not a packaged-app test; the isolated-profile check still applies.
+
 An initialized `--keep-profile` run keeps its first renderer, so cold-start defects remain observable. The driver reloads only when first-run gates or the requested language need updating.
 
 然后逐条发命令：
