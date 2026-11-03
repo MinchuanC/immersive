@@ -23,6 +23,16 @@ let browser;
 try {
     browser = await chromium.launch({ headless: true, executablePath: chrome });
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    if (process.argv.includes('--low-power')) await page.addInitScript(() => {
+        const request = window.requestAnimationFrame.bind(window), cancel = window.cancelAnimationFrame.bind(window);
+        const pending = window.lowPowerPendingFrames = new Set();
+        window.requestAnimationFrame = callback => {
+            const id = request(time => { pending.delete(id); callback(time); });
+            pending.add(id);
+            return id;
+        };
+        window.cancelAnimationFrame = id => { pending.delete(id); cancel(id); };
+    });
     page.setDefaultTimeout(10000);
     const errors = [];
     page.on('pageerror', error => errors.push(error.stack));
@@ -102,6 +112,37 @@ try {
         assert.ok(power.spanX > 4.5 && power.spanY > 4.5, 'Reduced points still cover the whole scene');
         for (const key of ['stable', 'textStable', 'dprStable', 'savedStable', 'moves', 'geometryStable', 'latestPreferencesPreserved']) assert.equal(power[key], true, key);
         console.log('Low Power scene parity:', JSON.stringify(power));
+        const client = await page.context().newCDPSession(page);
+        await client.send('Performance.enable');
+        const roundTrip = () => page.evaluate(async () => {
+            for (const lowPowerMode of [true, false]) {
+                stageApplyFrame({ ...stageSnapshot, lowPowerMode });
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            }
+        });
+        // Warm both index buffers before collecting the post-GC heap and live GPU/loop counts.
+        await roundTrip(); await roundTrip();
+        const sampleResources = async round => {
+            await client.send('HeapProfiler.collectGarbage');
+            const { metrics } = await client.send('Performance.getMetrics');
+            const counts = Object.fromEntries(metrics.filter(item => ['JSHeapUsedSize', 'JSEventListeners', 'Nodes'].includes(item.name)).map(item => [item.name, item.value]));
+            return { round, ...counts, ...await page.evaluate(() => ({
+                ...renderer.info.memory, frames: lowPowerPendingFrames.size,
+                held: window.__immersiveMotionHold?.held.size ?? 0,
+            })) };
+        };
+        const resources = [await sampleResources(0)];
+        for (let round = 1; round <= 20; round++) {
+            await roundTrip();
+            if (round % 5 === 0) resources.push(await sampleResources(round));
+        }
+        for (const sample of resources.slice(1)) {
+            for (const key of ['geometries', 'textures', 'frames', 'held', 'JSEventListeners']) assert.equal(sample[key], resources[0][key], 'Round-trip resource stability: ' + key);
+            assert.ok(sample.Nodes <= resources[0].Nodes + 4, 'No accumulating DOM nodes');
+            assert.ok(sample.JSHeapUsedSize <= resources[0].JSHeapUsedSize * 1.05 + 262144, 'No growing retained heap after warm-up');
+        }
+        console.log('Low Power warmed round-trip resources:', JSON.stringify(resources));
+        await client.detach();
         await page.reload();
         await seed();
     }
@@ -266,6 +307,11 @@ try {
         };
         createUserFxArchive(); saveUserFxArchive(0); setPreset(9, { noSave: true });
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await new Promise(resolve => {
+            const drained = event => { if (event.data === 'archive-setup-drained') { window.removeEventListener('message', drained); resolve(); } };
+            window.addEventListener('message', drained);
+            window.postMessage('archive-setup-drained', '*');
+        });
         window.addEventListener('message', receive);
         try {
             applyUserFxArchive(0);

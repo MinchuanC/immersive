@@ -73,6 +73,18 @@ The reported graphics reductions apply to the representative fixture and targete
 - Typecheck and production build passed. Full unit suite: **1,040 files passed, one skipped; 12,727 tests passed, two skipped** (`npm run test:unit -- --maxWorkers=4`). Two unrestricted runs hit the existing settings-window setup hook's 10-second timeout; that test passed 3/3 alone, and the complete suite passed with bounded concurrency and the Electron fixture closed. No test timeout or product behavior was changed. Existing jsdom CSS warnings and three obsolete stored-settings snapshots are unrelated and unchanged.
 - The archive camera smoke fixture previously collected a stale preset-change message; this also reproduced on the untouched baseline. The fixture now listens only after setup messages drain. Production camera code was not changed.
 
+## Independent review follow-up
+
+The fresh whole-branch review found no production defect and two Important verification gaps. Both were addressed with test/probe changes, without changing production behavior:
+
+- `lowPowerLyricParity.mjs` observes Sonnet's real Pixi glyph transforms at nine matched media times across the 10s and 20s line transitions in Standard → Low Power → Standard. The maximum pose difference was zero, with identical canvas identity/resolution and multiple distinct visible glyph poses. Live playback additionally observes actual renderer calls and moving glyph poses; both Sonnet and MineRadio retained approximately 120 renders/second through the switches. MineRadio crossed the same lyric boundary, retained its mesh and actual row texture quality, and never reset lyric entrance age or its animation clock. This uses renderer output, not the independent RAF counter from the CPU probe.
+- The stage smoke now samples post-GC heap, DOM/listener counts, pending RAF callbacks, and live GPU geometries/textures before, during and after 20 warmed round trips. Samples at rounds 0/5/10/15/20 retained 459 listeners, 3,289 DOM nodes, seven geometries, nine textures, one pending RAF and zero held callbacks. Retained heap ranged from 6.06 to 6.24 MB, within the explicitly bounded warm-up/GC allowance (5% plus 256 KiB).
+- Negative controls confirmed the checks fail for an intentionally accumulating listener and an intentionally displaced Low Power glyph. Those test-only faults were removed and the unmodified probes passed. The archive camera fixture now drains earlier posted messages with a queue sentinel before observing restoration.
+
+The reviewer left these boundaries explicit: existing Sonnet clipping, absolute energy/GPU-utilization gains, packaged installation/live Spotify/other OS testing, uniform savings for mods or arbitrary embedded scenes, and unrestricted-suite setup-hook contention. Delayed native-snapshot races were inspected but no actual ordering defect was established; that ordering is not separately simulated here. No second review was performed after the verification-only pass.
+
+Raw follow-up evidence: `test-results/low-power/lyric-parity.json` and `test-results/low-power/verification/review-*.log`.
+
 ## Reproduce
 
 From `app/`, using installed dependencies:
@@ -86,6 +98,6 @@ ELECTRON_DEV=false ELECTRON=true APP_RELEASE_CHANNEL=internal APP_VERSION_LABEL=
 node skills/run-desktop/driver.mjs serve --production --lang en
 ```
 
-In another terminal, run `node dev/probes/immersive/localPlaybackSmoke.mjs`, then `node dev/probes/immersive/lowPowerAcceptance.mjs` and `node dev/probes/immersive/lowPowerNativeSmoke.mjs`. Close the fixture with `node skills/run-desktop/driver.mjs quit`. Use the same harness/probe with `--baseline` against an archive of the base commit to compare pre-feature Standard. Never sample while builds or other tests run.
+In another terminal, run `node dev/probes/immersive/localPlaybackSmoke.mjs`, then `node dev/probes/immersive/lowPowerAcceptance.mjs`, `node dev/probes/immersive/lowPowerNativeSmoke.mjs`, and `node dev/probes/immersive/lowPowerLyricParity.mjs`. Close the fixture with `node skills/run-desktop/driver.mjs quit`. Use the same harness/probe with `--baseline` against an archive of the base commit to compare pre-feature Standard. Never sample while builds or other tests run.
 
 Local raw samples are in `test-results/low-power/feature.json` and `baseline.json`; screenshots are in `test-results/run-desktop/shots/`. These ignored artifacts use generated media only. No provider login, installed app, packaged build, battery watt-hours or per-app GPU utilization was tested. Existing Sonnet clipping is outside this change and remains visible in the same baseline layout.
