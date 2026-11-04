@@ -33,10 +33,22 @@ try {
     if (process.env.SCREENSHOT_DIR) await page.screenshot({ path: `${process.env.SCREENSHOT_DIR}/mineradio-shell-initial.png` });
     for (const id of ['play-btn', 'prev-btn', 'next-btn']) assert.equal(await page.locator(`.mineradio-dock #${id}`).isDisabled(), true);
     await page.getByRole('button', { name: 'Import your music', exact: true }).first().click();
-    await page.getByRole('button', { name: /Connect Spotify/ }).first().click();
+    await page.getByRole('button', { name: /Connect music services/ }).first().click();
     assert.ok((await page.evaluate(() => window.shellCommands)).some(command => command.action === 'openFiles'));
     assert.ok((await page.evaluate(() => window.shellCommands)).some(command => command.action === 'connectSource'));
+    for (const [providerId, label] of [['spotify', 'Spotify'], ['kugou', 'KuGou Music'], ['qq', 'QQ Music']]) {
+        const button = page.getByRole('button', { name: `Connect ${label}`, exact: true });
+        await button.focus();
+        await page.keyboard.press('Enter');
+        assert.equal(await page.evaluate(() => window.shellCommands.at(-1).value), providerId);
+    }
+    assert.equal(await page.getByRole('button', { name: 'Connect Unconfigured', exact: true }).isDisabled(), true);
+    assert.equal(await page.getByRole('button', { name: 'Connect Unsupported', exact: true }).count(), 0);
     await page.goto(`${baseUrl}/test/unit/mineradio/shellFixture.html?populated=true`);
+    await page.getByRole('button', { name: 'Account Spotify', exact: true }).click();
+    assert.equal(await page.evaluate(() => window.shellCommands.at(-1).value), 'spotify');
+    await page.getByRole('button', { name: 'Connect QQ Music', exact: true }).click();
+    assert.equal(await page.evaluate(() => window.shellCommands.at(-1).value), 'qq');
     await page.getByRole('button', { name: /Local collection/ }).click();
     await page.getByRole('button', { name: 'Play', exact: true }).click();
     await page.getByRole('button', { name: 'Next track', exact: true }).click();

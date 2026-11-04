@@ -7,8 +7,8 @@ const { registerLoginBackendIpc } = require('../../../electron/loginBackendIpc.c
 };
 
 const createBackend = (providerId: string) => ({
-    getPort: vi.fn(() => (providerId === 'netease' ? 4100 : null)),
-    getStatus: vi.fn(() => ({ status: providerId === 'netease' ? 'running' : 'error', port: null, error: null, updatedAt: 1 })),
+    getPort: vi.fn((): number | null => (providerId === 'netease' ? 4100 : null)),
+    getStatus: vi.fn(() => ({ status: providerId === 'netease' ? 'running' : 'error', port: null, error: null as string | null, updatedAt: 1 })),
     start: vi.fn(async () => ({ status: 'running', port: 4100, error: null, updatedAt: 2 })),
     // 网易的要问工作线程（异步），QQ 的当场给（同步）。
     getDiagnostics: vi.fn<() => object | Promise<object>>(() => ({ backend: { status: 'running' }, startup: [], connections: [] })),
@@ -43,9 +43,54 @@ describe('login backend IPC', () => {
             'restart-netease-api', 'run-login-self-check',
         ]);
         expect(invoke('get-netease-port')).toBe(4100);
-        expect(invoke('get-qq-port')).toBeNull();
+        await expect(invoke('get-qq-port')).resolves.toBeNull();
         await expect(invoke('restart-netease-api', 'needed')).resolves.toMatchObject({ status: 'running' });
         expect(netease.start).toHaveBeenCalledExactlyOnceWith('needed');
+    });
+
+    it('starts QQ on the first port request and shares startup while the server begins listening', async () => {
+        const { invoke, qq } = setup();
+        let finishStartup!: () => void;
+        qq.start.mockImplementation(() => new Promise(resolve => {
+            finishStartup = () => {
+                qq.getPort.mockReturnValue(4200);
+                resolve({ status: 'running', port: 4200, error: null, updatedAt: 2 });
+            };
+        }));
+
+        invoke('get-qq-api-status');
+        expect(qq.start).not.toHaveBeenCalled();
+        const first = invoke('get-qq-port');
+        const second = invoke('get-qq-port');
+        expect(qq.start).toHaveBeenCalledOnce();
+        let returned = false;
+        void Promise.resolve(first).then(() => { returned = true; });
+        await Promise.resolve();
+        expect(returned).toBe(false);
+
+        finishStartup();
+        await expect(first).resolves.toBe(4200);
+        await expect(second).resolves.toBe(4200);
+        await expect(invoke('get-qq-port')).resolves.toBe(4200);
+        expect(qq.start).toHaveBeenCalledOnce();
+    });
+
+    it('keeps a failed QQ startup and its status without trying to restart the cached API', async () => {
+        const { invoke, qq } = setup();
+        qq.getStatus.mockReturnValue({ status: 'error', port: null, error: 'listen failed', updatedAt: 2 });
+
+        await expect(invoke('get-qq-port')).resolves.toBeNull();
+        await expect(invoke('get-qq-port')).resolves.toBeNull();
+        expect(qq.start).toHaveBeenCalledOnce();
+        expect(invoke('get-qq-api-status')).toMatchObject({ status: 'error', error: 'listen failed' });
+    });
+
+    it('uses an already running QQ backend without starting it again', async () => {
+        const { invoke, qq } = setup();
+        qq.getPort.mockReturnValue(4200);
+
+        await expect(invoke('get-qq-port')).resolves.toBe(4200);
+        expect(qq.start).not.toHaveBeenCalled();
     });
 
     it('builds the diagnostics snapshot from the app environment and that backend', async () => {

@@ -12,7 +12,11 @@ Build and open `app/release/mac-arm64/Immersive.app` on an Apple Silicon Mac. Th
 
 Use **Import your music** to choose a music folder, or connect your own Spotify account. Immersive can play Spotify through its embedded player or control Spotify Desktop. Embedded playback uses an unofficial Spotify client and a separate sign-in; it may violate Spotify's terms and affect account access. Spotify permission for this integration has not been established. Some Spotify features may require Premium and a personal Spotify Developer Client ID; the app shows the callback address for the latter.
 
-Spotify sign-ins and settings belong to each user's local profile and are not included in this repository. Do not commit credentials, session data, or personal listening information.
+Home has separate **Connect Spotify**, **Connect KuGou Music**, and **Connect QQ Music** actions. KuGou uses its existing QR sign-in; QQ offers the scan methods supported by its bundled backend. Each service keeps its own account and uses the shared library, playback, lyrics, and music-reactive backgrounds. Signed-in services open their account controls, so another service can be connected without signing out first.
+
+Apple Music is not connected in this build. Its official [MusicKit integration](https://developer.apple.com/musickit/) requires developer credentials and a separately verified authorization/playback adapter.
+
+Service sign-ins and settings belong to each user's local profile and are not included in this repository. Do not commit credentials, session data, or personal listening information.
 
 The glass dock opens **Music library**, **Queue**, **Visual effects** (sparkles) and **Settings** (gear). The separate **Show player details** button opens song details, lyrics and playback controls; **Now playing** returns to the player. In Visual effects’ lyrics tab, choose **Folia** or **MineRadio** before adjusting that renderer. The command palette opens with Command-K or Control-K. Space plays/pauses; arrows seek; H cycles player chrome; Escape returns or closes the current panel.
 

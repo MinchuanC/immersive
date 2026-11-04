@@ -9,9 +9,10 @@ import { spotifyProvider } from '@/services/onlineMusic/spotify/spotifyProvider'
 import { qishuiProvider } from '@/services/onlineMusic/qishui/qishuiProvider';
 import { useOnlineProviderAccountStore } from '@/stores/useOnlineProviderAccountStore';
 
-// Copied adapter tests exercise their original registry explicitly; the product registers Spotify only.
-unregisterOnlineMusicProvider('spotify');
-for (const provider of [neteaseProvider, kugouProvider, qqProvider, bodianProvider, ytmProvider, spotifyProvider, qishuiProvider]) registerOnlineMusicProvider(provider);
+// Copied adapter tests exercise their original registry and ordering explicitly.
+const upstreamProviders = [neteaseProvider, kugouProvider, qqProvider, bodianProvider, ytmProvider, spotifyProvider, qishuiProvider];
+for (const provider of upstreamProviders) unregisterOnlineMusicProvider(provider.id);
+for (const provider of upstreamProviders) registerOnlineMusicProvider(provider);
 useOnlineProviderAccountStore.getState().setActiveProviderId('netease');
 
 // Upstream matching fixtures never reach the live lyric service.

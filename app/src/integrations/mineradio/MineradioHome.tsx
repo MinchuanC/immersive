@@ -4,6 +4,9 @@ import { homeContinueAction } from './controls';
 import { openMineradioConsole } from './MineradioHost';
 import type { StageCollection, StageCommand, StageMetadata, StageTrack } from './stageBridge';
 import { externalQueueMessage, type ExternalQueueStatus } from '../../components/app/externalPlayback/externalQueueStatus';
+import type { ProviderAccountSummary } from '../../types/onlineMusic';
+import { openLoginWindow } from '../../components/login/loginWindowStore';
+import { orderRows, rowStatus } from '../../components/login/platformRows';
 import './MineradioHome.donor.css';
 import './MineradioShell.css';
 
@@ -16,13 +19,14 @@ export interface MineradioHomeProps {
     paused: boolean;
     externalConnected?: boolean;
     externalSourceLabel?: string;
+    providers?: readonly ProviderAccountSummary[];
     externalQueue?: boolean;
     externalQueueStatus?: ExternalQueueStatus;
     onCommand: (command: StageCommand) => void;
     t?: (key: string, options?: { provider: string }) => string;
 }
 
-export function MineradioHome({ metadata, collections = [], queue = [], nextUp: next = null, paused, externalConnected = false, externalSourceLabel = 'Streaming', externalQueue = false, externalQueueStatus = 'unavailable', onCommand, t }: MineradioHomeProps) {
+export function MineradioHome({ metadata, collections = [], queue = [], nextUp: next = null, paused, externalConnected = false, externalSourceLabel = 'Streaming', providers = [], externalQueue = false, externalQueueStatus = 'unavailable', onCommand, t }: MineradioHomeProps) {
     const [now, setNow] = useState(() => new Date());
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 30_000);
@@ -31,10 +35,12 @@ export function MineradioHome({ metadata, collections = [], queue = [], nextUp: 
     const text = (key: string, fallback: string) => { const translated = t?.(`options.mineradio${key}`); return translated && translated !== `options.mineradio${key}` ? translated : fallback; };
     const cover = metadata?.coverUrl || collections.find(collection => collection.cover)?.cover;
     const command = (action: StageCommand['action'], value?: unknown) => onCommand({ action, ...(value === undefined ? {} : { value }) });
+    const connectionLabel = externalConnected ? externalSourceLabel.toUpperCase() : text('ServicesLabel', 'MUSIC SERVICES');
+    const connectionTitle = externalConnected ? externalSourceLabel : text('ConnectServices', 'Connect music services');
     const cards = [
         { tone: 'search', label: text('ContinueLabel', 'CONTINUE'), title: metadata?.title || text('Continue', 'Continue listening'), sub: metadata?.artist || text('ContinueHint', 'Pick up your queue'), action: () => onCommand(homeContinueAction(metadata, queue, paused)), icon: Play },
         { tone: 'library', label: text('LibraryLabel', 'LIBRARY'), title: text('Library', 'Music library'), sub: text('LibraryHint', 'Your playlists, albums and local files'), action: () => command('openLibrary'), icon: Library },
-        { tone: 'mix', label: externalSourceLabel.toUpperCase(), title: externalConnected ? externalSourceLabel : `${text('ConnectSource', 'Connect')} ${externalSourceLabel}`, sub: externalConnected ? text('ExternalHint', 'Browse your saved music') : text('ConnectHint', 'Bring your streaming library into the room'), action: () => command(externalConnected ? 'openLibrary' : 'connectSource'), icon: Radio },
+        { tone: 'mix', label: connectionLabel, title: connectionTitle, sub: externalConnected ? text('ExternalHint', 'Browse your saved music') : text('ConnectHint', 'Bring your streaming library into the room'), action: () => command(externalConnected ? 'openLibrary' : 'connectSource'), icon: Radio },
         { tone: 'playlist', label: text('LocalMusicLabel', 'LOCAL MUSIC'), title: text('ImportMusic', 'Import your music'), sub: text('ImportHint', 'Choose audio files from your Mac'), action: () => command('openFiles'), icon: FolderOpen },
     ];
     return <div className="mineradio-home diy-mode empty-home-active">
@@ -62,6 +68,20 @@ export function MineradioHome({ metadata, collections = [], queue = [], nextUp: 
                     </button>)}
                 </div>
                 <div className="home-rail home-insight-rail">
+                    <div className="mb-4 flex flex-wrap gap-3" role="group" aria-label={text('ConnectServices', 'Connect music services')}>
+                        {orderRows(providers, null).map(provider => (
+                            <button
+                                key={provider.providerId}
+                                type="button"
+                                disabled={rowStatus(provider) === 'off'}
+                                title={rowStatus(provider) === 'off' ? t?.('home.providerNotConfigured') : undefined}
+                                onClick={event => openLoginWindow(provider.providerId, event.currentTarget)}
+                                className="rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                {provider.status === 'authenticated' ? text('Account', 'Account') : text('ConnectSource', 'Connect')} {provider.displayName}
+                            </button>
+                        ))}
+                    </div>
                     <div id="home-insight-dock" className="home-insight-dock">
                         <section className="home-insight-card home-listen-card" aria-labelledby="home-listen-heading">
                             <div className="home-insight-head"><div id="home-listen-heading" className="home-insight-kicker">{text('YourMusic', 'YOUR MUSIC')}</div><button className="home-insight-link" type="button" onClick={() => command('openLibrary')}>{text('Explore', 'Explore')} <ArrowUpRight size={12} /></button></div>
@@ -87,7 +107,7 @@ export function MineradioHome({ metadata, collections = [], queue = [], nextUp: 
                             </div>
                         </section>
                         <button className="home-insight-card home-ranking-entry" type="button" onClick={() => command('openLibrary')}><span className="home-ranking-entry-copy"><span className="home-insight-kicker">{text('FoliaLibraryLabel', 'MUSIC LIBRARY')}</span><span className="home-ranking-entry-title">{text('FullLibrary', 'Your complete music library')}</span><span className="home-ranking-entry-sub">{text('FullLibraryHint', 'Search, organize, import lyrics and build a queue')}</span></span><span className="home-ranking-entry-art" aria-hidden="true"><i /><i /><i /><i /><i /></span><span className="home-next-arrow" aria-hidden="true">›</span></button>
-                        <button className="home-insight-card home-ranking-entry home-radio-entry" type="button" onClick={() => command(externalConnected ? 'openPlayer' : 'connectSource')}><span className="home-ranking-entry-copy"><span className="home-insight-kicker">{externalConnected ? text('PlayerLabel', 'NOW PLAYING') : externalSourceLabel.toUpperCase()}</span><span className="home-ranking-entry-title">{externalConnected ? text('OpenPlayer', 'Now playing') : `${text('ConnectSource', 'Connect')} ${externalSourceLabel}`}</span><span className="home-ranking-entry-sub">{externalConnected ? text('ImmersiveHint', 'Thirteen scenes with synchronized lyrics') : text('ConnectHint', 'Bring your streaming library into the room')}</span></span><span className="home-radio-entry-art" aria-hidden="true"><i /><i /></span><span className="home-next-arrow" aria-hidden="true">›</span></button>
+                        <button className="home-insight-card home-ranking-entry home-radio-entry" type="button" onClick={() => command(externalConnected ? 'openPlayer' : 'connectSource')}><span className="home-ranking-entry-copy"><span className="home-insight-kicker">{externalConnected ? text('PlayerLabel', 'NOW PLAYING') : connectionLabel}</span><span className="home-ranking-entry-title">{externalConnected ? text('OpenPlayer', 'Now playing') : connectionTitle}</span><span className="home-ranking-entry-sub">{externalConnected ? text('ImmersiveHint', 'Thirteen scenes with synchronized lyrics') : text('ConnectHint', 'Bring your streaming library into the room')}</span></span><span className="home-radio-entry-art" aria-hidden="true"><i /><i /></span><span className="home-next-arrow" aria-hidden="true">›</span></button>
                     </div>
                 </div>
             </div>

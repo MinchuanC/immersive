@@ -88,6 +88,14 @@ afterEach(() => {
 });
 
 describe('online music provider registry', () => {
+    it.each(['spotify', 'kugou', 'qq'])('registers %s with its own sign-in and shared playback adapter', providerId => {
+        const provider = requireOnlineMusicProvider(providerId);
+        expect(provider.capabilities).toMatchObject({ auth: true, playback: true, lyrics: true, userLibrary: true });
+        expect(provider.auth?.startLogin).toBeTypeOf('function');
+        expect(provider.auth?.checkLogin).toBeTypeOf('function');
+        expect(provider.playback?.getAudioSource).toBeTypeOf('function');
+    });
+
     it('accepts providers that implement only declared capabilities', () => {
         registerOnlineMusicProvider(partialProvider);
         expect(getOnlineMusicProvider('partial-test')).toBe(partialProvider);

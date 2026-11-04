@@ -81,7 +81,6 @@ import { Album, Artist, LyricData, Theme, PlayerState, SongResult, ReplayGainMod
 import type { LocalSong } from './types';
 import { getLocalSongArrayBuffer, importFolder } from './services/localMusicService';
 import { registerLocalTrackFileReader } from './services/analysis/trackAudio';
-import { DEFAULT_ONLINE_PROVIDER_ID } from './types/onlineMusic';
 import type { MediaId, OnlineProviderId, ProviderCollection } from './types/onlineMusic';
 import { resolveSongCatalogRef } from './services/onlineMusic/catalogRefs';
 import { omni } from './services/onlineMusic/omni';
@@ -2123,7 +2122,7 @@ export default function App() {
                     setIsPanelOpen(true);
                 } else navigateToLattice();
                 break;
-            case 'connectSource': openLoginWindow(DEFAULT_ONLINE_PROVIDER_ID); break;
+            case 'connectSource': openLoginWindow(); break;
             case 'openLibrary': navigateToHome(); break;
             case 'openSettings': commandPalette.invokeCommandById('settings-options'); break;
             case 'lyricsMode':
@@ -2873,6 +2872,7 @@ export default function App() {
                             paused={displayPlayerState !== PlayerState.PLAYING}
                             externalConnected={activeProvider?.status === 'authenticated'}
                             externalSourceLabel={activeProvider?.displayName}
+                            providers={onlineProviders}
                             onCommand={handleMineradioCommand}
                             t={t}
                         /> : <Home
