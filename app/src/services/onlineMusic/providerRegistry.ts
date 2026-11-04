@@ -3,6 +3,8 @@ import type { OnlineMusicProvider, OnlineProviderId, ProviderCapabilities } from
 import type { SongResult } from '../../types';
 import { getPlaybackSourceRef } from '../../utils/appPlaybackGuards';
 import { spotifyProvider } from './spotify/spotifyProvider';
+import { kugouProvider } from './kugou/kugouProvider';
+import { qqProvider } from './qq/qqProvider';
 
 // src/services/onlineMusic/providerRegistry.ts
 
@@ -109,3 +111,5 @@ export const requireOnlineMusicProviderForSong = (song: SongResult): OnlineMusic
 };
 
 registerOnlineMusicProvider(spotifyProvider);
+registerOnlineMusicProvider(kugouProvider);
+registerOnlineMusicProvider(qqProvider);

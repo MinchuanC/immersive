@@ -7,6 +7,8 @@ import type FloatingPlayerControls from '../../../src/components/FloatingPlayerC
 import { PlayerState } from '../../../src/types';
 import PanelHandle from '../../../src/components/panelTab/shell/PanelHandle';
 import { DEFAULT_THEME } from '../../../src/services/baseThemes';
+import type { ProviderAccountSummary } from '../../../src/types/onlineMusic';
+import { useLoginWindowStore } from '../../../src/components/login/loginWindowStore';
 import '../../../src/index.css';
 
 // This isolated fixture contains no player; actions and clock updates are observable by the smoke.
@@ -19,6 +21,15 @@ const metadata = populated ? { title: 'Shared player fixture', artist: 'Real hos
 const collections = populated ? [{ id: 'collection-a', name: 'Local collection', trackCount: 8 }, { id: 'collection-b', name: 'Saved collection', trackCount: 24 }] : [];
 const queue = populated ? [{ id: 'track-a', title: 'Shared player fixture', artist: 'Real host metadata' }, { id: 'track-b', title: 'Next actual track', artist: 'Next artist' }] : [];
 const command = (value: unknown) => fixtureWindow.shellCommands.push(value);
+useLoginWindowStore.subscribe(state => command({ action: 'login', value: state.providerId }));
+const providers: ProviderAccountSummary[] = [
+    ['spotify', 'Spotify'], ['kugou', 'KuGou Music'], ['qq', 'QQ Music'],
+].map(([providerId, displayName]) => ({
+    providerId, displayName, shortName: displayName, availability: { configured: true },
+    status: populated && providerId === 'spotify' ? 'authenticated' : 'anonymous', user: null, collections: [],
+}));
+providers.push({ providerId: 'unconfigured', displayName: 'Unconfigured', shortName: 'Unconfigured', availability: { configured: false }, status: 'anonymous', user: null, collections: [] });
+providers.push({ ...providers[3], providerId: 'unsupported', displayName: 'Unsupported', availability: { configured: false, reason: 'runtime-unavailable' } });
 const controls: React.ComponentProps<typeof FloatingPlayerControls> | undefined = populated ? {
     currentSong: { name: metadata!.title }, playerState: PlayerState.PAUSED, currentTime: fixtureWindow.shellClock,
     duration: 180, loopMode: 'off', currentView: 'player', audioSrc: 'fixture', canTogglePlay: true, lyrics: null, isDaylight: false,
@@ -29,7 +40,7 @@ const controls: React.ComponentProps<typeof FloatingPlayerControls> | undefined 
     trackNavigation: { currentTrackKey: 'track-a', onPrev: () => command({ action: 'previous' }), onNext: () => command({ action: 'next' }), canPrev: false, canNext: true, prevTitle: null, nextTitle: 'Next actual track', prevLabel: 'Previous track', nextLabel: 'Next track' },
 } : undefined;
 createRoot(document.getElementById('root')!).render(<>
-    <MineradioHome metadata={metadata} collections={collections} queue={queue} nextUp={queue[1] ?? null} paused externalSourceLabel="Spotify" onCommand={command} />
+    <MineradioHome metadata={metadata} collections={collections} queue={queue} nextUp={queue[1] ?? null} paused externalConnected={populated} externalSourceLabel="Spotify" providers={providers} onCommand={command} />
     <MineradioDock metadata={metadata} currentTime={fixtureWindow.shellClock} duration={populated ? 180 : 0} paused volume={0.7} compactOnIdle={compactOnIdle} controls={controls} onCommand={command} onOpenExperience={() => command({ action: 'experience' })} />
     {compactOnIdle && <PanelHandle isOpen={false} onToggle={() => command({ action: 'panel' })} theme={DEFAULT_THEME} isDaylight={false} showOpenPanelCloseButton isPanelGuideHotspotActive={false} hideToggleButton={false} isCommandPaletteOpen={false} />}
     {compactOnIdle && <button type="button" style={{ position: 'fixed', top: 12, left: 12, zIndex: 100 }} onClick={() => document.getElementById('play-btn')?.focus()}>Restore player focus</button>}

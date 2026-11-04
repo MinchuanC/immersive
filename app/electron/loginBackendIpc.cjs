@@ -60,7 +60,13 @@ function registerLoginBackendIpc({
   ipcMain.handle('get-netease-api-status', () => neteaseBackend.getStatus());
   // reason 'needed'：页面上一个请求要用它、它却因为断网没起来；规则在后端的 start 里。
   ipcMain.handle('restart-netease-api', (_event, reason) => neteaseBackend.start(reason));
-  ipcMain.handle('get-qq-port', () => qqBackend.getPort());
+  // QQ loads its server once; share startup and retain failures because require cannot restart it.
+  let qqStartup = null;
+  ipcMain.handle('get-qq-port', async () => {
+    if (!qqStartup && qqBackend.getPort() === null) qqStartup = qqBackend.start();
+    await qqStartup;
+    return qqBackend.getPort();
+  });
   ipcMain.handle('get-qq-api-status', () => qqBackend.getStatus());
 
   // 扫码登录失败后渲染进程用它生成可以直接贴进 issue 的诊断报告。没有内嵌后端的 provider 回 null。

@@ -29,7 +29,7 @@ UI / hooks / stores / app services
 
 图里的 `<id>Provider.ts` 和 `<id>Transport.ts` 都在各平台自己的目录 `<id>/` 里（例如 `qq/qqProvider.ts`）。网易云没有单独的 transport，请求在 `netease/netease.ts`。
 
-当前 registry 注册 `netease`、`kugou`、`qq`，以及桌面端的 `bodian`、`ytm`（YouTube Music）、`spotify` 和 `qishui`（汽水音乐）。波点接入状态、接口与剩余验收见
+Immersive 当前 registry 注册 `spotify`、`kugou` 和 `qq`，复用各自的登录、资料库和播放 adapter。桌面端 QQ 后端在首次请求端口时启动；网页端 QQ 和酷狗仍需配置各自的 API 地址。其余上游 adapter 保留在源码中，未在此构建启用。波点接入状态、接口与剩余验收见
 [`docs/bodian.md`](../../../docs/bodian.md)；支持喜欢与自建歌单歌曲增删，收藏写入尚未实现。Navidrome 是独立的 Subsonic 服务，入口是 `src/services/navidromeService.ts`，不属于 Omni provider。
 
 登录的分工：provider 把后端的回答翻成 `LoginState`。失败带着平台的原话（`message`）和事实（`failure`：码、原话、HTTP 状态、要等多久，或者直接点名的情况，比如 QQ 的登录设备超限 `device-limit`）；这一次检查在网络这一层没拿到回答、码在平台那边还有效时标 `transient`，登录接着检查。要码与生成二维码拿不到 key / 图片时直接抛错，不交出空值。情况怎么分在 `login/loginFailureCase.ts`，平台自己的码是什么意思由它的 `describeLoginFailure` 说。登录失败后由登录调用一次 `omni.runLoginSelfCheck` 主动自检（`loginSelfCheck.ts`），结果进诊断报告；`omni.getLoginDiagnostics` 的 provider 段每一行都由 `login/loginDiagnosticReport.ts` 的 `diagnosticLine` 写，放进去的文字先洗过：登录凭据、IP 和账号不进报告。
