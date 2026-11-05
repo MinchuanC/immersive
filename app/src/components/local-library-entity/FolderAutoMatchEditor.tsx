@@ -5,6 +5,7 @@ import type { LocalSong } from '../../types';
 import type { LocalLibraryAssignment } from '../../types/localLibrary';
 import { batchAutoMatchLocalSongMetadata, useImportedSnapshotForLocalSong } from '../../services/localSongMetadataMatchService';
 import type { OnlineMetadataCandidate } from '../../services/onlineMetadataSearchService';
+import { setStatusMessage } from '../../stores/useStatusMessageStore';
 import { FolderSongPicker } from './FolderSongPicker';
 
 // src/components/local-library-entity/FolderAutoMatchEditor.tsx
@@ -98,7 +99,7 @@ export const FolderAutoMatchEditor = ({ songs, assignments, isDaylight, onManual
             await onChanged();
         } catch (error) {
             console.error('[LocalMusic] Failed to restore imported snapshots:', error);
-            window.alert(t('localMusic.entityOperationFailed'));
+            setStatusMessage({ type: 'error', text: t('localMusic.entityOperationFailed') });
         } finally {
             setRestoringLocalInfo(false);
         }
