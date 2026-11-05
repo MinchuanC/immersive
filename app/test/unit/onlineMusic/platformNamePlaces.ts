@@ -45,7 +45,6 @@ export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
     'electron/stageApi.cjs': { n: { netease: 17 }, kind: 'main', why: 'the stage API: its lyric source type and its search through the local service' },
     'electron/tempDirEnvironment.cjs': { n: { netease: 1 }, kind: 'doc' },
     'src/App.tsx': { n: { netease: 6, kugou: 1 }, kind: 'question', why: 'mounts the hook that hands out one platform\'s account (useNeteaseLibrary); raised by the upstream merge 2026-10-17' },
-    'src/components/Carousel3D.tsx': { n: { netease: 2 }, kind: 'doc' },
     'src/components/app/command-palette-context/buildSettingsCommandContext.ts': { n: { netease: 2 }, kind: 'stored', why: 'the stored setting neteaseScrobbleEnabled and its i18n keys' },
     'src/components/app/home/explore/exploreFeedMemory.ts': { n: { ytm: 1 }, kind: 'doc' },
     'src/components/app/home/explore/recentPlays.ts': { n: { ytm: 1 }, kind: 'doc' },
