@@ -217,8 +217,8 @@ drums 0.0008 / bass 0.0071 / other 0.0005 / vocals 0.0000 dB，都在 0.01 dB �
 | `folia_mnn_prefer_fast_cores()` | `folia_mnn.cpp`，worker 启动时调用 | 上一版 `prefer_fast_cores()` 的移植：Windows 最小化后不被挪到能效核（12.7s → 28.1s 那条） |
 | beat_this 走 GPU，CPU 只给 automix | `../analysis/beatThis.ts` `cpuFallback` | CPU 每块 0.4–0.7 s，GPU 约 0.06 s；只有提前几分钟分析的 automix 等得起 |
 
-以下是上一版（onnxruntime + Python）的做法，留作来历。完整诊断见
-[`docs/automix-memory-optimization.md`](../../../docs/automix-memory-optimization.md)。
+以下是上一版（onnxruntime + Python）的做法，留作来历，不是待做。不要恢复 `htdemucs_runner.py`；MNN 在进程内，见 `electron/analysis/htdemucs.cjs`。
+历史说明：[`docs/automix-memory-optimization.md`](../../../docs/automix-memory-optimization.md)。
 
 | 做法 | 在哪 | 省了什么 |
 | --- | --- | --- |
@@ -230,10 +230,9 @@ drums 0.0008 / bass 0.0071 / other 0.0005 / vocals 0.0000 dB，都在 0.01 dB �
 | `prefer_fast_cores()` | `htdemucs_runner.py` | Windows 把最小化后的后台进程调度到能效核，同一窗口 12.7s → 28.1s。软偏好不硬绑定，非混合架构自动 no-op |
 | beat_this 走 WebGPU / htdemucs 走 CPU | `worker.cjs` 的 `PROVIDERS` | **按用途分而非按速度分**：GPU 两个都更快，但分离撞可视化器换歌场景、也撞「一边听歌一边打游戏」，而它有分钟级提前量；beat_this 有截止期，迟到的网格等于没有网格 |
 
-**为何必须用 Python。** `enable_mem_reuse` 是 ORT 内部 C++ 结构体的一个 bool，只有 Python
+**当时为何用 Python。** `enable_mem_reuse` 是 ORT 内部 C++ 结构体的一个 bool，只有当时的 Python
 pybind 直接绑定它——onnxruntime-node 无此字段、`extra` 配置口子仅对 WASM 开放、C API 也无
-setter；自编 C++ 二进制会撞同一堵墙。因此 app 额外下载一个裁剪版 CPython
-（35–61 MB，随平台，见清单 `runtime` 条目），仅为拨动这一个开关。
+setter。所以上一版额外下载一个裁剪版 CPython（35–61 MB，随平台，清单里的 `runtime` 条目），只为拨动这一个开关。这条路已经退役。
 
 ---
 

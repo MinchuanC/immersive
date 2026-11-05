@@ -1,7 +1,5 @@
 # Unified Immersive Player Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans for the primary lane. Bounded native subagents may implement independent slices; all inherit the parent model. Steps use checkbox syntax for tracking.
-
 **Goal:** Build and package one macOS music player directly combining Folia's complete application and MineRadio's visual UI, with Spotify desktop and local music playback.
 
 **Architecture:** Folia's pinned React/Electron source is the application foundation in `app/`. MineRadio's original scene, controls and shelf are integrated render modules sharing Folia's canonical playback/library state. Official Spotify browsing/authentication and macOS desktop control replace the original private Spotify audio transport.
@@ -18,6 +16,7 @@
 - Genuine word timings only; line and untimed lyrics retain honest fallbacks.
 - Spotify desktop handles Spotify audio. No guessed FFT, cross-service song substitution or private Spotify audio cache.
 - Reference checkouts stay unchanged. Product uses an independent application identity and user-data directory.
+- `app/` is already the product tree. Do not copy upstream Folia into `app/` again.
 - No public release, automatic upstream update installation, or account credentials in source.
 
 ## Review Focus
@@ -27,17 +26,6 @@
 - Invalid lyric timings, malformed metadata and rapidly changing tracks must not animate stale or invented words.
 - Repeated scene/style changes must release graphics/listeners without resetting the shared playback clock.
 - Packaged macOS permissions, missing credentials and missing native assets must yield actionable states rather than an apparently connected player.
-
-## Task 1: Establish the licensed application and runnable baseline
-
-**Files:** create `app/` from Folia revision `aecd330b720eb8fc728e6b10ebcec261b144d683`; root `.gitignore`, `README.md`; `app/UPSTREAM-NOTICE.md`; modify `app/package.json` and packaging identity only.
-
-**Interfaces:** existing Folia APIs remain the baseline. Product name `Immersive`, distinct app ID `local.immersive.player`, independent user-data directory. Frozen MineRadio revision `d43de565acabfdc1a9c9820a27e81a98ccbebcef` is the visual donor.
-
-- [ ] Copy tracked upstream files without `.git`, dependencies or private credentials; retain licenses, attribution and tests. Initialize the new root Git repository and record provenance.
-- [ ] Inspect install/build lifecycle scripts, install the locked dependencies, and run upstream typecheck plus focused visualizer/library/parser tests before changes. Record pre-existing failures.
-- [ ] Give the app its independent name/profile, disable upstream application updates, and add explicit macOS development/build commands that do not build Windows/Linux helpers.
-- [ ] Verify Vite and Electron launch from the copied application; commit the baseline.
 
 ## Task 2: Connect official Spotify and exclusive playback ownership
 
@@ -100,7 +88,3 @@
 - [ ] Inspect 960×640, 1280×800, 1440×900 and 1920×1080/fullscreen, Retina, keyboard focus and reduced motion. Confirm source fidelity and no blank background during transitions.
 - [ ] Build an arm64 macOS `.app` with attribution and required usage descriptions/entitlements. Launch the packaged artifact and check its console, resource loading, local files and profile isolation.
 - [ ] Review the whole change in a fresh same-model reviewer lane, resolve actionable findings, and provide the app path, launch instructions and exact remaining verification limits.
-
-## Execution method
-
-The user explicitly authorized the complete build. The primary agent implements and integrates in this session, using bounded same-model lanes for independent Spotify, MineRadio and lyric work. No additional permission handoff is required for the approved local build.
