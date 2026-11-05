@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-const axios = require('axios');
 const dns = require('dns').promises;
 const https = require('https');
 const net = require('net');
@@ -118,21 +117,64 @@ function printResult(result) {
   console.log(`       error=${JSON.stringify(result.error)}`);
 }
 
+function requestHttps({ host, method, path, data, headers, agent, timeoutMs }) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (error, value) => {
+      if (settled) return;
+      settled = true;
+      if (error) reject(error);
+      else resolve(value);
+    };
+
+    const req = https.request({
+      host,
+      servername: host,
+      method,
+      path,
+      headers,
+      agent,
+      timeout: timeoutMs,
+    }, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.on('error', finish);
+      res.on('end', () => {
+        const text = Buffer.concat(chunks).toString('utf8');
+        let body = text;
+        if (text) {
+          try {
+            body = JSON.parse(text);
+          } catch {
+            body = text;
+          }
+        }
+        finish(null, { status: res.statusCode, data: body });
+      });
+    });
+
+    req.on('timeout', () => {
+      req.destroy(Object.assign(new Error('timeout'), { code: 'ECONNABORTED' }));
+    });
+    req.on('error', finish);
+    if (data) req.write(data);
+    req.end();
+  });
+}
+
 async function runCase({ label, host, method, path = '/', data, headers, ip, timeoutMs }) {
   const start = Date.now();
-  const agent = ip ? createPinnedAgent(host, ip, timeoutMs) : undefined;
+  const agent = ip ? createPinnedAgent(host, ip, timeoutMs) : false;
 
   try {
-    const response = await axios({
+    const response = await requestHttps({
+      host,
       method,
-      url: `https://${host}${path}`,
+      path,
       data,
       headers,
-      httpsAgent: agent,
-      timeout: timeoutMs,
-      proxy: false,
-      validateStatus: () => true,
-      maxRedirects: 0,
+      agent,
+      timeoutMs,
     });
 
     return {
@@ -154,9 +196,7 @@ async function runCase({ label, host, method, path = '/', data, headers, ip, tim
       error: summarizeError(error),
     };
   } finally {
-    if (agent) {
-      agent.destroy();
-    }
+    if (agent) agent.destroy();
   }
 }
 
