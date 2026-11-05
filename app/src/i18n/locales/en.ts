@@ -4341,59 +4341,6 @@ export default {
       "description": "One endless wall of tiles you drag around. Content flips into place on the wall, and the page's info and actions sit in a seam in the middle."
     }
   },
-  "userGuide": {
-    "title": "Welcome to Folia",
-    "subtitle": "Here are some tips to help you navigate.",
-    "commandPalette": {
-      "title": "Command Palette",
-      "desc": "Press the \"s\" key on the playback page to open the Command Palette and access commands quickly."
-    },
-    "executeMode": {
-      "title": "Execute mode",
-      "desc": "Press \":\" on the playback page, then a single key such as n or v, to run a command immediately."
-    },
-    "typeToSearch": {
-      "title": "Instant Search",
-      "desc": "Press any key in a song list to instantly start searching."
-    },
-    "posterSearch": {
-      "entryTitle": "Start from a poster wall",
-      "entryDesc": "When a song poster wall is focused, type letters, numbers, or Chinese characters to search the current list.",
-      "escapeTitle": "Close search",
-      "escapeDesc": "Press Esc to close the poster-wall search panel."
-    },
-    "theme": {
-      "title": "Color themes",
-      "desc": "Customize Folia with your own light and dark color themes, or generate an AI theme from the current song.",
-      "customDesc": "Open Theme Park from visual settings or the command palette to edit and save custom light and dark colors.",
-      "aiDesc": "When AI theme settings are configured, Folia can create song-aware colors and optionally auto-apply cached song themes."
-    },
-    "clickThrough": {
-      "title": "Click-through recovery",
-      "desc": "When click-through is enabled, you can use the system tray icon to switch it if the window controls are hidden or hard to reach.",
-      "trayTitle": "Use the tray icon",
-      "trayDesc": "Right-click the Folia system tray icon, then choose the click-through option to turn it on or off.",
-      "lockTitle": "Use the lock button",
-      "lockDesc": "You can also move to the top titlebar hotspot to reveal the lock button, then click it to turn click-through off."
-    },
-    "gotIt": "Got it",
-    "showGuide": "Show User Guide",
-    "tips": "Usage tips",
-    "next": "Next",
-    "back": "Back",
-    "page2Title": "Commands & Shortcuts",
-    "page2Subtitle": "Master shortcuts for the best experience.",
-    "shortcutsPageTitle": "Player shortcuts",
-    "shortcutsPageSubtitle": "Keyboard controls available on the player page.",
-    "commandsPageTitle": "Command palette",
-    "shortcuts": "Shortcuts",
-    "commands": "All Commands",
-    "commandsDesc": "You can trigger commands by typing English, Chinese characters, or Pinyin.",
-    "ready": {
-      "title": "Ready to Go",
-      "subtitle": "Enjoy your music journey with Folia."
-    }
-  },
   "remote": {
     "backgroundDefault": "Default Background",
     "backgroundCover": "Cover Colors",

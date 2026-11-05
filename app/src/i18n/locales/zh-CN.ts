@@ -4715,59 +4715,6 @@ export default {
       "description": "一整面没有尽头的磁贴墙，拖动着浏览；内容在墙上翻牌更替，这一页的信息和操作在墙中间的缝里。"
     }
   },
-  "userGuide": {
-    "title": "欢迎使用 Folia",
-    "subtitle": "这里有一些提示，希望能帮到你。",
-    "commandPalette": {
-      "title": "命令面板",
-      "desc": "在播放页面按下 S键 即可打开命令面板，快速访问功能与设置。"
-    },
-    "executeMode": {
-      "title": "执行模式",
-      "desc": "在播放页按 \":\"，再敲一个字母（例如 n 或 v）即可立即执行对应命令。"
-    },
-    "typeToSearch": {
-      "title": "全局搜索",
-      "desc": "在任意歌曲海报墙中按下任意字母或数字键，即可直接开始搜索当前列表。"
-    },
-    "posterSearch": {
-      "entryTitle": "从海报墙开始",
-      "entryDesc": "当歌曲海报墙处于当前视图时，直接输入字母、数字或中文字符即可搜索当前列表。",
-      "escapeTitle": "关闭搜索",
-      "escapeDesc": "按下 Esc 可以关闭海报墙搜索面板。"
-    },
-    "theme": {
-      "title": "配色主题",
-      "desc": "可以手动定制亮色 / 暗色配色，也可以根据当前歌曲生成 AI 主题。",
-      "customDesc": "从视觉设置或命令面板打开主题乐园，编辑并保存自定义亮色与暗色配色。",
-      "aiDesc": "配置 AI 主题设置后，Folia 可以根据歌曲生成配色，并可自动应用已缓存的歌曲主题。"
-    },
-    "clickThrough": {
-      "title": "点击穿透恢复",
-      "desc": "开启点击穿透后，如果窗口控件被隐藏或不方便触达，可以通过系统托盘图标切换点击穿透。",
-      "trayTitle": "使用托盘图标",
-      "trayDesc": "右键点击 Folia 的系统托盘图标，在菜单中选择点击穿透选项，即可开启或关闭。",
-      "lockTitle": "使用锁定按钮",
-      "lockDesc": "也可以把鼠标移到顶部标题栏热点，唤出锁定按钮后点击关闭点击穿透。"
-    },
-    "gotIt": "我知道了",
-    "showGuide": "使用指南",
-    "tips": "使用提示",
-    "next": "下一页",
-    "back": "返回",
-    "page2Title": "命令与快捷键",
-    "page2Subtitle": "在播放页面可以使用如下快捷操作",
-    "shortcutsPageTitle": "播放页快捷键",
-    "shortcutsPageSubtitle": "播放页面可用的键盘操作",
-    "commandsPageTitle": "命令面板",
-    "shortcuts": "播放页快捷键",
-    "commands": "全部命令",
-    "commandsDesc": "输入任意命令的拼音、汉字或英文均可快速触发。",
-    "ready": {
-      "title": "准备就绪",
-      "subtitle": "尽情享受您的音乐之旅。"
-    }
-  },
   "remote": {
     "backgroundDefault": "默认背景",
     "backgroundCover": "封面色彩",
