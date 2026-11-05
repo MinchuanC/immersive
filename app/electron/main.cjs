@@ -66,7 +66,7 @@ const {
   describeWallpaperDisplays,
 } = require('./wallpaper/wallpaperDisplay.cjs');
 const { createKugouApiBridge } = require('./kugou/kugouApiBridge.cjs');
-const { createExternalUrlOpener } = require('./externalUrlPolicy.cjs');
+const { createExternalUrlOpener, resolveExternalUrl } = require('./externalUrlPolicy.cjs');
 const { createSenderGuardedHandler } = require('./ipcAccessGuard.cjs');
 const { createQishuiApiBridge } = require('./qishui/qishuiApiBridge.cjs');
 const { createQishuiMediaPolicy } = require('./qishui/mediaCors.cjs');
@@ -5270,6 +5270,48 @@ function ensureWallpaperLayerHeldByMainWindow() {
   }
 }
 
+// A real origin (the dev server) may stay on that origin. A packaged loadFile page has the opaque
+// origin "null", which is also what every other file:, data:, and about: URL reports, so that case
+// may only repeat the current document: enough for location.reload(), not enough to leave index.html.
+function isAllowedMainFrameNavigation(currentUrl, targetUrl) {
+  const currentOrigin = normalizeOrigin(currentUrl);
+  const targetOrigin = normalizeOrigin(targetUrl);
+  if (currentOrigin && currentOrigin !== 'null' && currentOrigin === targetOrigin) {
+    return true;
+  }
+  try {
+    const current = new URL(currentUrl);
+    const target = new URL(targetUrl);
+    current.hash = '';
+    target.hash = '';
+    return current.href === target.href;
+  } catch {
+    return false;
+  }
+}
+
+// Same refusal as the YouTube Music sandbox: no window.open popup, and the main frame may not
+// leave this app. An http(s) address that is turned away goes through openExternalUrl.
+function lockAppWindowNavigation(webContents) {
+  const openIfHttp = (url) => {
+    if (resolveExternalUrl(url)) {
+      void openExternalUrl(url);
+    }
+  };
+  webContents.setWindowOpenHandler(({ url }) => {
+    openIfHttp(url);
+    return { action: 'deny' };
+  });
+  webContents.on('will-navigate', (event, url) => {
+    const targetUrl = typeof url === 'string' ? url : event.url;
+    if (isAllowedMainFrameNavigation(webContents.getURL(), targetUrl)) {
+      return;
+    }
+    event.preventDefault();
+    openIfHttp(targetUrl);
+  });
+}
+
 function createRemoteControlWindow() {
   if (remoteControlWindow && !remoteControlWindow.isDestroyed()) {
     remoteControlWindow.setTitle(REMOTE_CONTROL_WINDOW_TITLE);
@@ -5320,6 +5362,7 @@ function createRemoteControlWindow() {
   });
 
   remoteControlWindow = win;
+  lockAppWindowNavigation(win.webContents);
   remoteControlPointerInside = false;
   remoteControlMouseIgnored = false;
   clearInterval(remoteControlPointerTimer);
@@ -5491,7 +5534,7 @@ function createWindow(options = {}) {
         preload: path.join(__dirname, 'preload.cjs'),
         nodeIntegration: false,
         contextIsolation: true,
-        webSecurity: true, // Disable for local app
+        webSecurity: true,
         backgroundThrottling: false
       }
     });
@@ -5502,6 +5545,7 @@ function createWindow(options = {}) {
     wallpaperWatchdog.handleWindowBuildFailure();
     throw error;
   }
+  lockAppWindowNavigation(win.webContents);
   win.__wallpaperWindowTransparent = useTransparentWindow;
   win.__wallpaperGeometry = useWallpaperGeometry;
   win.__transparentFullscreen = false;
@@ -6210,7 +6254,10 @@ ipcMain.handle('report-device-pixel-ratio', (event, ratio) => {
   }
 });
 
-ipcMain.handle('get-settings', () => {
+ipcMain.handle('get-settings', (event) => {
+  if (!isTrustedMainWindowContents(event.sender)) {
+    return false;
+  }
   return getPublicSettings();
 });
 
@@ -6278,6 +6325,9 @@ ipcMain.handle('set-app-locale', (event, localeKey) => {
 });
 
 ipcMain.handle('save-settings', (event, key, value) => {
+  if (!isTrustedMainWindowContents(event.sender)) {
+    return false;
+  }
   // electron-store's set() also accepts an object of key/value pairs, which would bypass the
   // per-key guards below.
   if (typeof key !== 'string') {
@@ -6532,14 +6582,20 @@ ipcMain.handle('save-settings', (event, key, value) => {
   return getPublicSettings();
 });
 
-ipcMain.handle('get-cache-directory', () => {
+ipcMain.handle('get-cache-directory', (event) => {
+  if (!isTrustedMainWindowContents(event.sender)) {
+    return false;
+  }
   return {
     path: getConfiguredCacheDirectory(),
     isDefault: !store.has(CACHE_DIRECTORY_SETTING_KEY),
   };
 });
 
-ipcMain.handle('choose-cache-directory', async () => {
+ipcMain.handle('choose-cache-directory', async (event) => {
+  if (!isTrustedMainWindowContents(event.sender)) {
+    return false;
+  }
   if (!mainWindow || mainWindow.isDestroyed()) {
     return {
       canceled: true,
@@ -7541,6 +7597,9 @@ ipcMain.handle('lyric-proxy-fetch', async (event, url, init) => {
 
 // Integrate AI logic locally into Electron
 ipcMain.handle('generate-theme', async (event, lyricsText, options = {}) => {
+  if (!isTrustedMainWindowContents(event.sender)) {
+    return false;
+  }
   try {
     const { isPureMusic = false, songTitle } = options;
     const provider = store.get('AI_PROVIDER') || 'gemini';
@@ -7638,6 +7697,9 @@ ipcMain.handle('ai-test-connection', async (event, payload) => {
 // its prompt with the web handlers and with the client's copy-to-a-model-site path through
 // shared/lyricSegmentationPrompt.cjs, so all four routes ask for exactly the same thing.
 ipcMain.handle('segment-lyrics', async (event, lines) => {
+  if (!isTrustedMainWindowContents(event.sender)) {
+    return false;
+  }
   // Held outside the try so the failure path can print what the model actually said. Without it a
   // rejected response gives the user a stack trace and nothing to act on.
   let rawResponse = null;
