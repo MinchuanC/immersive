@@ -287,7 +287,6 @@
     "@webgpu/types": "0.1.74",
     "@xmldom/xmldom": "^0.9.12",
     "animejs": "^4.5.0",
-    "autoprefixer": "^10.6.1",
     "baseline-browser-mapping": "^2.11.26",
     "blueimp-md5": "^2.19.0",
     "budoux": "^0.9.3",
