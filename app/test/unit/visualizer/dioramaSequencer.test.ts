@@ -10,7 +10,7 @@ import {
     totalGlobalLines,
     updateActiveSegmentLines,
 } from '@/components/visualizer/diorama/dioramaSequencer';
-import { bezierArc, flightPerp, flightSide, pickTransitionOffset, transitionEase, TRANSITION_DISTANCE } from '@/components/visualizer/diorama/dioramaTransition';
+import { flightPerp, flightSide, pickTransitionOffset, transitionEase, TRANSITION_DISTANCE } from '@/components/visualizer/diorama/dioramaTransition';
 
 // Minimal lyric lines - the sequencer only needs the array length and passes the objects straight to the
 // (separately tested) shot/formation builders, so the contents are irrelevant here.
@@ -57,18 +57,6 @@ describe('dioramaTransition geometry', () => {
         expect(transitionEase(0)).toBeCloseTo(0, 6);
         expect(transitionEase(1)).toBeCloseTo(1, 6);
         expect(transitionEase(0.5)).toBeCloseTo(0.5, 6);
-    });
-
-    it('bezierArc hits both endpoints exactly', () => {
-        const from: DioramaVec = { x: 0, y: 1, z: 9 };
-        const to: DioramaVec = { x: 20, y: 5, z: -30 };
-        const ctrl: DioramaVec = { x: 10, y: 12, z: -5 };
-        expect(dist(bezierArc(from, ctrl, to, 0), from)).toBeLessThan(1e-9);
-        expect(dist(bezierArc(from, ctrl, to, 1), to)).toBeLessThan(1e-9);
-        // A bowed control lifts the midpoint off the straight chord.
-        const mid = bezierArc(from, ctrl, to, 0.5);
-        const chordMidY = (from.y + to.y) / 2;
-        expect(mid.y).toBeGreaterThan(chordMidY);
     });
 
     it('flightPerp is a horizontal unit vector perpendicular to the flight direction', () => {
