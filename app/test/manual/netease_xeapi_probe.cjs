@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const dns = require('dns');
+const dns = require('dns').promises;
 const https = require('https');
 const net = require('net');
 const crypto = require('crypto');
@@ -32,121 +32,22 @@ function parseArgs(argv) {
   return options;
 }
 
-function pinnedLookup(ip) {
+function createPinnedAgent(host, ip, timeoutMs) {
   const family = net.isIP(ip);
-  return (_hostname, lookupOptions, callback) => {
-    const done = typeof lookupOptions === 'function' ? lookupOptions : callback;
-    const options = typeof lookupOptions === 'function' ? {} : lookupOptions || {};
-    if (options.all) {
-      done(null, [{ address: ip, family }]);
-      return;
-    }
-    done(null, ip, family);
-  };
-}
-
-// fetch 的全局连接池会复用上一跳的 TCP，钉 IP 就会连到错误的地址。
-// 这里每次单独直连（原来的 httpsAgent、proxy: false），钉 IP 时 lookup 只返回那个地址，SNI 仍是主机名。
-function createDirectDispatcher({ lookup, signal, timeoutMs }) {
-  return {
-    dispatch(opts, handler) {
-      const origin = new URL(opts.origin);
-      let settled = false;
-      const req = https.request({
-        protocol: origin.protocol,
-        hostname: origin.hostname,
-        port: origin.port || 443,
-        method: opts.method,
-        path: opts.path,
-        headers: opts.headers,
-        servername: net.isIP(origin.hostname) ? undefined : origin.hostname,
-        agent: false,
-        ...(lookup ? { lookup } : {}),
-      });
-
-      const fail = (error) => {
-        if (settled) return;
-        settled = true;
-        try {
-          handler.onError(error);
-        } catch {
-          // fetch 已经因这次失败结束。
-        }
-        req.destroy();
-      };
-
-      const onAbort = () => {
-        fail(signal.reason || new Error('The operation was aborted'));
-      };
-
-      try {
-        handler.onConnect((error) => {
-          fail(error || new Error('The operation was aborted'));
-        });
-      } catch (error) {
-        fail(error);
-        return true;
+  return new https.Agent({
+    keepAlive: false,
+    servername: host,
+    timeout: timeoutMs,
+    lookup: (_hostname, lookupOptions, callback) => {
+      const done = typeof lookupOptions === 'function' ? lookupOptions : callback;
+      const options = typeof lookupOptions === 'function' ? {} : lookupOptions || {};
+      if (options.all) {
+        done(null, [{ address: ip, family }]);
+        return;
       }
-      if (settled) return true;
-
-      if (signal) {
-        if (signal.aborted) {
-          onAbort();
-          return true;
-        }
-        signal.addEventListener('abort', onAbort, { once: true });
-      }
-
-      req.setTimeout(timeoutMs, () => {
-        const error = new Error('timeout');
-        error.code = 'ECONNABORTED';
-        fail(error);
-      });
-
-      req.on('error', fail);
-      req.on('response', (res) => {
-        const chunks = [];
-        res.on('data', (chunk) => chunks.push(chunk));
-        res.on('error', fail);
-        res.on('end', () => {
-          if (settled) return;
-          const headerList = [];
-          for (const [key, value] of Object.entries(res.headers)) {
-            const items = Array.isArray(value) ? value : [value];
-            for (const item of items) {
-              if (item != null) headerList.push(key, String(item));
-            }
-          }
-          try {
-            handler.onHeaders(res.statusCode, headerList, () => {}, res.statusMessage || '');
-            if (opts.method !== 'HEAD') {
-              const body = Buffer.concat(chunks);
-              if (body.length) handler.onData(body);
-            }
-            handler.onComplete([]);
-            settled = true;
-            if (signal) signal.removeEventListener('abort', onAbort);
-            req.setTimeout(0);
-          } catch (error) {
-            fail(error);
-          }
-        });
-      });
-
-      (async () => {
-        try {
-          if (opts.body) {
-            for await (const chunk of opts.body) req.write(chunk);
-          }
-          req.end();
-        } catch (error) {
-          fail(error);
-        }
-      })();
-
-      return true;
+      done(null, ip, family);
     },
-  };
+  });
 }
 
 function buildXeapiKeyForm(deviceId, currentKeyVersion = '') {
@@ -187,30 +88,19 @@ function summarizeData(data) {
 }
 
 function summarizeError(error) {
-  const cause = error.cause || {};
   return {
     name: error.name,
     message: error.message,
-    code: error.code || cause.code,
-    errno: error.errno || cause.errno,
-    syscall: error.syscall || cause.syscall,
-    address: error.address || cause.address,
-    port: error.port || cause.port,
+    code: error.code,
+    errno: error.errno,
+    syscall: error.syscall,
+    address: error.address,
+    port: error.port,
     status: error.response && error.response.status,
     response: error.response && summarizeData(error.response.data),
-    causeCode: cause.code,
-    causeMessage: cause.message,
+    causeCode: error.cause && error.cause.code,
+    causeMessage: error.cause && error.cause.message,
   };
-}
-
-async function readResponseBody(response) {
-  const text = await response.text();
-  if (!text) return text;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
 }
 
 function printResult(result) {
@@ -227,25 +117,65 @@ function printResult(result) {
   console.log(`       error=${JSON.stringify(result.error)}`);
 }
 
+function requestHttps({ host, method, path, data, headers, agent, timeoutMs }) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (error, value) => {
+      if (settled) return;
+      settled = true;
+      if (error) reject(error);
+      else resolve(value);
+    };
+
+    const req = https.request({
+      host,
+      servername: host,
+      method,
+      path,
+      headers,
+      agent,
+      timeout: timeoutMs,
+    }, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.on('error', finish);
+      res.on('end', () => {
+        const text = Buffer.concat(chunks).toString('utf8');
+        let body = text;
+        if (text) {
+          try {
+            body = JSON.parse(text);
+          } catch {
+            body = text;
+          }
+        }
+        finish(null, { status: res.statusCode, data: body });
+      });
+    });
+
+    req.on('timeout', () => {
+      req.destroy(Object.assign(new Error('timeout'), { code: 'ECONNABORTED' }));
+    });
+    req.on('error', finish);
+    if (data) req.write(data);
+    req.end();
+  });
+}
+
 async function runCase({ label, host, method, path = '/', data, headers, ip, timeoutMs }) {
   const start = Date.now();
-
-  const signal = AbortSignal.timeout(timeoutMs);
+  const agent = ip ? createPinnedAgent(host, ip, timeoutMs) : false;
 
   try {
-    const response = await fetch(`https://${host}${path}`, {
+    const response = await requestHttps({
+      host,
       method,
+      path,
+      data,
       headers,
-      body: data,
-      redirect: 'manual',
-      signal,
-      dispatcher: createDirectDispatcher({
-        lookup: ip ? pinnedLookup(ip) : undefined,
-        signal,
-        timeoutMs,
-      }),
+      agent,
+      timeoutMs,
     });
-    const body = await readResponseBody(response);
 
     return {
       ok: response.status > 0 && response.status < 500,
@@ -254,7 +184,7 @@ async function runCase({ label, host, method, path = '/', data, headers, ip, tim
       ip,
       durationMs: Date.now() - start,
       status: response.status,
-      data: summarizeData(body),
+      data: summarizeData(response.data),
     };
   } catch (error) {
     return {
@@ -265,12 +195,14 @@ async function runCase({ label, host, method, path = '/', data, headers, ip, tim
       durationMs: Date.now() - start,
       error: summarizeError(error),
     };
+  } finally {
+    if (agent) agent.destroy();
   }
 }
 
 async function resolveHost(host) {
   try {
-    const records = await dns.promises.lookup(host, { all: true });
+    const records = await dns.lookup(host, { all: true });
     return records.map((record) => record.address);
   } catch (error) {
     console.log(`[DNS ] ${host} ${JSON.stringify(summarizeError(error))}`);
