@@ -13,17 +13,7 @@
 - CPU 版 htdemucs 由 MNN 照 `htdemucs-wgsl.bin` 手写网络（`native/folia-mnn/folia_htdemucs.cpp`）。
 - 智能动感三档：关闭 / 只用已分析（只读存盘结果，从不启动推理）/ 开启（`SmartBeatMode`）。
 
-下面是还没做的部分。
-
-## 起因：现在的浪费
-
-| 浪费 | 现状 |
-|---|---|
-| 读文件、解码 | 拍点、automix 分轨、鼓轨各读各解，一首最多解码 3 次 |
-| htdemucs | automix 在 CPU（MNN）上分固定的头尾各 30 秒四轨（`services/automix/stems.ts`，只在内存里）；智能动感在 GPU 上整首再分一遍，只留鼓轨、其余三轨丢掉（`services/analysis/drumStem.ts` → `drumHits.ts`）。两边分段起点不同，结果没法互用 |
-| 显存 / 内存 | 两边各自常驻，没有统一预算。automix 的 CPU 分离峰值约 530 MB，两边同时跑约 1.1 GB |
-| 切换画面 | PR #734 的临时做法：鼓轨分离切画面不停，后台跑完（见「暂停与续算」；2b 已替换） |
-| 排队 | `beatThisGpu.ts` 的 `queue` 是一条 FIFO 链，不分轻重缓急，也不能暂停 |
+调度层已在 `src/services/analysis/scheduler.ts`（阶段 2）。下面是当时定下的设计，供 `scheduler.ts` 等注释对照；做到哪一步以文末「分阶段」表为准。不要按「调度层还没做」重做。
 
 ## 目标架构：功能只提交任务，调度层决定一切
 
