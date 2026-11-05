@@ -17,6 +17,7 @@ import {
 } from '../../../services/temperaImageArchive';
 import { createSafeObjectUrl } from '../../../utils/blobGuards';
 import { setStatusMessage } from '../../../stores/useStatusMessageStore';
+import { useConfirmDialog } from '../../shared/useConfirmDialog';
 import { formatLocalDateStamp, sanitizeDownloadFileName } from '../../../utils/downloadFileName';
 import TemperaImageLayerDialog, {
     isTemperaPoolWriteLocked,
@@ -90,6 +91,7 @@ const TemperaImageLayerControls: React.FC<TemperaImageLayerControlsProps> = ({
     onCommit,
 }) => {
     const { t } = useTranslation();
+    const { ask: askConfirm, dialog: confirmDialog } = useConfirmDialog(isDaylight);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [draft, setDraft] = useState<TemperaImageLayerCommit>({
         layerImages: images,
@@ -325,10 +327,15 @@ const TemperaImageLayerControls: React.FC<TemperaImageLayerControlsProps> = ({
         // Replacement is destructive once the resulting draft is committed, so confirm the mode
         // before reading or writing the selected archive.
         if (mode === 'replace' && draft.layerImages.length > 0
-            && !window.confirm(t('options.temperaImportConfirmReplace', {
-                defaultValue: '替换导入会先清空当前 {{count}} 张图片，确定继续？',
-                count: draft.layerImages.length,
-            }))) {
+            && !await askConfirm({
+                title: t('options.temperaImportReplaceImages', { defaultValue: '替换当前图片池' }),
+                description: t('options.temperaImportConfirmReplace', {
+                    defaultValue: '替换导入会先清空当前 {{count}} 张图片，确定继续？',
+                    count: draft.layerImages.length,
+                }),
+                confirmText: t('options.temperaImportReplaceImages', { defaultValue: '替换当前图片池' }),
+                confirmVariant: 'danger',
+            })) {
             return;
         }
 
@@ -415,7 +422,7 @@ const TemperaImageLayerControls: React.FC<TemperaImageLayerControlsProps> = ({
             if (activeWriteAbortRef.current === abortController) activeWriteAbortRef.current = null;
             if (isMountedRef.current) setBusy('idle');
         }
-    }, [busy, draft.layerImages, reportPoolResult, t]);
+    }, [askConfirm, busy, draft.layerImages, reportPoolResult, t]);
 
     return (
         <>
@@ -470,6 +477,7 @@ const TemperaImageLayerControls: React.FC<TemperaImageLayerControlsProps> = ({
                 onExportPool={() => void exportPool()}
                 busy={busy}
             />
+            {confirmDialog}
         </>
     );
 };

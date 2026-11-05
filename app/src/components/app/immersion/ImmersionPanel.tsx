@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { Theme } from '../../../types';
 import type { EditionCue } from '../../../types/immersion';
 import { isRecipe } from '../../../services/immersion/personalEditions';
+import { Select } from '../../modal/settings/kit/Select';
 import { SettingsKitThemeContext } from '../../modal/settings/kit/kitTheme';
 import Sheet, { SheetButton } from '../../shared/Sheet';
 import type { ImmersionModel } from './useImmersion';
@@ -23,7 +24,6 @@ const position = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math
 const ImmersionPanel: React.FC<Props> = ({ model, isDaylight = false, theme }) => {
     const { t } = useTranslation();
     const labelId = useId();
-    const albumId = useId();
     const edition = model.edition;
     const cues = Array.isArray(edition?.cues) ? edition.cues.filter(isCue) : [];
     const incompatible = !!edition && (edition.version !== 1 || edition.scoreVersion !== 1
@@ -129,11 +129,17 @@ const ImmersionPanel: React.FC<Props> = ({ model, isDaylight = false, theme }) =
                         {model.onlineAlbumLoading && <p className={`${detailClass} mt-3`} role="status">{t('immersion.onlineAlbumLoading')}</p>}
                         {model.onlineAlbumError && <p className={`${detailClass} mt-3`} role="status">{t('immersion.onlineAlbumUnavailable')}</p>}
                         {model.albums.length ? <>
-                            <label htmlFor={albumId} className="mb-2 mt-4 block text-xs font-medium text-[var(--st-t2)]">{t('immersion.chooseAlbum')}</label>
-                            <select id={albumId} value={model.selectedAlbum?.key ?? ''} onChange={event => model.setSelectedAlbumKey(event.target.value)} disabled={model.busy}
-                                className="h-10 w-full rounded-lg border border-[var(--st-line2)] bg-[var(--st-card)] px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--st-accent)] disabled:opacity-40">
-                                {model.albums.map(album => <option key={album.key} value={album.key}>{album.name} · {t('immersion.trackCount', { count: album.tracks.length })}</option>)}
-                            </select>
+                            <p className="mb-2 mt-4 text-xs font-medium text-[var(--st-t2)]">{t('immersion.chooseAlbum')}</p>
+                            <Select
+                                name={t('immersion.chooseAlbum')}
+                                value={model.selectedAlbum?.key ?? ''}
+                                options={model.albums.map(album => ({
+                                    value: album.key,
+                                    label: `${album.name} · ${t('immersion.trackCount', { count: album.tracks.length })}`,
+                                }))}
+                                onChange={model.setSelectedAlbumKey}
+                                disabled={model.busy}
+                            />
                         </> : <p className={`${detailClass} mt-3`}>{t('immersion.noAlbums')}</p>}
                         {journey && <p className="mt-3 text-sm leading-relaxed" role="status" aria-live="polite">
                             {journey.state === 'completed' ? t('immersion.journeyCompleted', { album: journey.albumName })
