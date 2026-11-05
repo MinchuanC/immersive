@@ -4341,59 +4341,6 @@ export default {
       "description": "Satu dinding ubin tanpa ujung yang bisa digeser. Konten berganti di dinding, sementara info dan tindakan halaman ada di celah di tengahnya."
     }
   },
-  "userGuide": {
-    "title": "Selamat datang di Folia",
-    "subtitle": "Berikut beberapa tips untuk membantu Anda menavigasi.",
-    "commandPalette": {
-      "title": "Palette Perintah",
-      "desc": "Tekan tombol \"s\" di halaman pemutaran untuk membuka Palette Perintah dan mengakses perintah dengan cepat."
-    },
-    "executeMode": {
-      "title": "Mode eksekusi",
-      "desc": "Tekan \":\" di halaman pemutar, lalu satu tombol seperti n atau v, untuk langsung menjalankan perintah."
-    },
-    "typeToSearch": {
-      "title": "Pencarian Instan",
-      "desc": "Tekan tombol apa saja di daftar lagu untuk langsung mulai mencari."
-    },
-    "posterSearch": {
-      "entryTitle": "Mulai dari dinding poster",
-      "entryDesc": "Saat dinding poster lagu difokuskan, ketik huruf, angka, atau karakter Tionghoa untuk mencari daftar saat ini.",
-      "escapeTitle": "Tutup pencarian",
-      "escapeDesc": "Tekan Esc untuk menutup panel pencarian dinding poster."
-    },
-    "theme": {
-      "title": "Tema warna",
-      "desc": "Sesuaikan Folia dengan tema warna terang dan gelap Anda sendiri, atau hasilkan tema AI dari lagu saat ini.",
-      "customDesc": "Buka Taman Tema dari pengaturan visual atau palette perintah untuk mengedit dan menyimpan warna terang dan gelap kustom.",
-      "aiDesc": "Saat pengaturan tema AI dikonfigurasi, Folia dapat membuat warna yang peka lagu dan secara opsional menerapkan otomatis tema lagu yang di-cache."
-    },
-    "clickThrough": {
-      "title": "Pemulihan klik-tembus",
-      "desc": "Saat klik-tembus diaktifkan, Anda dapat menggunakan ikon tray sistem untuk mengalihkannya jika kontrol jendela disembunyikan atau sulit dijangkau.",
-      "trayTitle": "Gunakan ikon tray",
-      "trayDesc": "Klik kanan ikon tray sistem Folia, lalu pilih opsi klik-tembus untuk mengaktifkan atau menonaktifkannya.",
-      "lockTitle": "Gunakan tombol kunci",
-      "lockDesc": "Anda juga dapat bergerak ke hotspot titlebar atas untuk mengungkap tombol kunci, lalu klik untuk menonaktifkan klik-tembus."
-    },
-    "gotIt": "Mengerti",
-    "showGuide": "Tampilkan Panduan Pengguna",
-    "tips": "Tips penggunaan",
-    "next": "Berikutnya",
-    "back": "Kembali",
-    "page2Title": "Perintah & Pintasan",
-    "page2Subtitle": "Kuasai pintasan untuk pengalaman terbaik.",
-    "shortcutsPageTitle": "Pintasan pemutar",
-    "shortcutsPageSubtitle": "Kontrol keyboard yang tersedia di halaman pemutar.",
-    "commandsPageTitle": "Palette perintah",
-    "shortcuts": "Pintasan",
-    "commands": "Semua Perintah",
-    "commandsDesc": "Anda dapat memicu perintah dengan mengetik bahasa Inggris, karakter Tionghoa, atau Pinyin.",
-    "ready": {
-      "title": "Siap Digunakan",
-      "subtitle": "Nikmati perjalanan musik Anda bersama Folia."
-    }
-  },
   "remote": {
     "backgroundDefault": "Latar Belakang Bawaan",
     "backgroundCover": "Warna Sampul",
