@@ -158,7 +158,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
 
   let commitSuffix = '';
   const canResolveCommitName = /^[0-9a-f]{7,40}$/i.test(commitHash) && !/^0+$/.test(commitHash);
-  if (canResolveCommitName) {
+  if (process.env.REQUIRE_COMMIT_NAME === 'true' && canResolveCommitName) {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
@@ -217,7 +217,6 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
       rollupOptions: {
         input: {
           main: 'index.html',
-          stageClient: 'stage-client.html',
           modExport: 'mod-export.html',
         },
         output: {
@@ -254,7 +253,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     },
     server: {
       port: 3000,
-      host: '0.0.0.0',
+      host: '127.0.0.1',
       watch: {
         // Build output and model weights are not sources, and watching them breaks packaging: the
         // watcher opens a handle on every directory it finds, and electron-builder packages by
